@@ -23,7 +23,7 @@ return new class extends Migration
             $table->decimal('final_total_amount', 8, 2);
             $table->enum('payment_method', ['online_payment', 'cod']);
             $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');
-            $table->string('payment_intent_id')->nullable();
+           // ❌ REMOVED: $table->string('payment_intent_id')->nullable();
             $table->text('special_instructions')->nullable();
             $table->string('delivery_proof_image')->nullable(); 
             $table->softDeletes();

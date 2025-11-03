@@ -23,6 +23,7 @@ class RiderApplication extends Model
         'valid_id_url',
         'selfie_with_id_url',
         'tin_number',
+        'gcash_number',
         'status',
         'admin_notes',
         'reviewed_by_user_id',

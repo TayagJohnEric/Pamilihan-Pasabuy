@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('valid_id_url')->nullable();
             $table->string('selfie_with_id_url')->nullable();
             $table->string('tin_number')->nullable();
+            $table->string('gcash_number')->nullable()->unique();
             $table->string('status')->default('pending');
             $table->text('admin_notes')->nullable();
             $table->foreignId('reviewed_by_user_id')->nullable()->constrained('users')->nullOnDelete();

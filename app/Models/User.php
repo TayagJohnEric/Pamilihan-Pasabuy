@@ -134,4 +134,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(ShoppingCartItem::class, 'user_id');
     }
+
+    public function verifiedPayments()
+    {
+        return $this->hasMany(Payment::class, 'verified_by_user_id');
+    }
 }

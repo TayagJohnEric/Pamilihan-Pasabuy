@@ -22,7 +22,6 @@ class Order extends Model
         'final_total_amount',
         'payment_method',
         'payment_status',
-        'payment_intent_id',
         'special_instructions',
         'delivery_proof_image',
     ];

@@ -11,16 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
+       
         Schema::create('riders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete()->unique();
-            $table->decimal('average_rating', 3, 2)->nullable(); // e.g. 4.75
+            $table->decimal('average_rating', 3, 2)->nullable();
             $table->unsignedInteger('total_deliveries')->default(0);
             $table->unsignedInteger('daily_deliveries')->default(0);
-            $table->boolean('is_available')->default(false); 
-            $table->string('verification_status')->default('pending'); // pending, verified, rejected
+            $table->boolean('is_available')->default(false);
+            $table->string('verification_status')->default('pending');
             $table->string('license_number')->nullable();
-            $table->string('vehicle_type')->nullable(); // bike, motorcycle, car, etc.
+            $table->string('vehicle_type')->nullable();
+            // ✅ ADDED for new workflow
+            $table->string('gcash_number')->nullable()->unique(); // GCash mobile number (unique is good)
+            $table->string('gcash_qr_path')->nullable();               // Image filename/path of GCash QR code
+            $table->string('gcash_name')->nullable();             // GCash account holder name
             $table->decimal('current_latitude', 10, 8)->nullable();
             $table->decimal('current_longitude', 11, 8)->nullable();
             $table->timestamp('location_last_updated_at')->nullable();
