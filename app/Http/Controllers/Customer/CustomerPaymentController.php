@@ -8,11 +8,12 @@ use App\Models\Payment;
 use App\Models\SavedAddress;
 use App\Models\ShoppingCartItem;
 use App\Models\User;
+use App\Models\Rider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Exception;
 
 class CustomerPaymentController extends Controller
@@ -61,9 +62,9 @@ class CustomerPaymentController extends Controller
     }
     
     /**
-     * Process online payment by creating PayMongo checkout session
+     * Display GCash payment instructions and upload page
      */
-    public function processOnlinePayment(Request $request)
+    public function showGCashInstructions(Request $request)
     {
         $orderSummary = session('order_summary');
         
@@ -72,47 +73,153 @@ class CustomerPaymentController extends Controller
                 ->with('error', 'Invalid payment session. Please try again.');
         }
         
+        // Validate cart items are still available
+        $user = Auth::user();
+        $cartItems = ShoppingCartItem::with(['product.vendor', 'product'])
+            ->where('user_id', $user->id)
+            ->get();
+        
+        if ($cartItems->isEmpty() || $cartItems->count() !== $orderSummary['item_count']) {
+            return redirect()->route('cart.index')
+                ->with('error', 'Your cart has changed. Please review and try again.');
+        }
+        
+        // Get rider's GCash details
+        $riderGCashDetails = null;
+        
+        if ($orderSummary['rider_selection_type'] === 'choose_rider' && $orderSummary['selected_rider']) {
+            $rider = Rider::where('user_id', $orderSummary['selected_rider']->id)
+                ->with('user')
+                ->first();
+            
+            if ($rider && $rider->gcash_number) {
+                $riderGCashDetails = [
+                    'rider_name' => $orderSummary['selected_rider']->name,
+                    'gcash_name' => $rider->gcash_name ?? $orderSummary['selected_rider']->name,
+                    'gcash_number' => $rider->gcash_number,
+                    'gcash_qr_path' => $rider->gcash_qr_path,
+                ];
+            }
+        }
+        
+        // If no rider selected or no GCash details, get a default/system GCash account
+        if (!$riderGCashDetails) {
+            // Option 1: Get first available rider with GCash details
+            $availableRider = Rider::whereNotNull('gcash_number')
+                ->where('is_available', true)
+                ->where('verification_status', 'approved')
+                ->with('user')
+                ->first();
+            
+            if ($availableRider) {
+                $riderGCashDetails = [
+                    'rider_name' => $availableRider->user->name,
+                    'gcash_name' => $availableRider->gcash_name ?? $availableRider->user->name,
+                    'gcash_number' => $availableRider->gcash_number,
+                    'gcash_qr_path' => $availableRider->gcash_qr_path,
+                ];
+                
+                // Update order summary with this rider
+                $orderSummary['selected_rider'] = $availableRider->user;
+                $orderSummary['rider_selection_type'] = 'system_assign';
+                session(['order_summary' => $orderSummary]);
+            } else {
+                // No riders with GCash available
+                return redirect()->route('checkout.index')
+                    ->with('error', 'No payment recipient available. Please try again later or contact support.');
+            }
+        }
+        
+        return view('customer.checkout.gcash-payment-instructions', compact('orderSummary', 'riderGCashDetails'));
+    }
+    
+    /**
+     * Process GCash payment proof submission
+     */
+    public function submitGCashProof(Request $request)
+    {
+        $orderSummary = session('order_summary');
+        
+        if (!$orderSummary || $orderSummary['payment_method'] !== 'online_payment') {
+            return redirect()->route('checkout.index')
+                ->with('error', 'Invalid payment session. Please try again.');
+        }
+        
+        // Validate request
+        $validated = $request->validate([
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:5120', // 5MB max
+            'customer_reference_code' => 'nullable|string|max:100',
+            'special_instructions' => 'nullable|string|max:500',
+        ], [
+            'payment_proof.required' => 'Please upload a screenshot of your payment.',
+            'payment_proof.image' => 'Payment proof must be an image file.',
+            'payment_proof.mimes' => 'Payment proof must be a JPEG, PNG, or JPG file.',
+            'payment_proof.max' => 'Payment proof must not exceed 5MB.',
+        ]);
+        
         DB::beginTransaction();
         
         try {
             // Create order with pending_payment status
-            $order = $this->createOrderFromSession($orderSummary, 'online_payment', $request->input('special_instructions'));
+            $order = $this->createOrderFromSession(
+                $orderSummary, 
+                'online_payment', 
+                $request->input('special_instructions')
+            );
             
             // Create order items
             $this->createOrderItems($order, $orderSummary['cart_items']);
             
-            // Create payment record
-            $payment = $this->createPaymentRecord($order, $orderSummary['total_amount'], 'online_payment');
-            
-            // Create PayMongo checkout session
-            $checkoutSession = $this->createPayMongoCheckout($order, $orderSummary);
-            
-            if (!$checkoutSession) {
-                throw new Exception('Failed to create PayMongo checkout session');
+            // Upload payment proof
+            $paymentProofPath = null;
+            if ($request->hasFile('payment_proof')) {
+                $file = $request->file('payment_proof');
+                $filename = 'payment_proof_' . $order->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $paymentProofPath = $file->storeAs('payment_proofs', $filename, 'public');
             }
             
-            // Update order with checkout session ID
-            $order->update(['payment_intent_id' => $checkoutSession['id']]);
-            $payment->update([
-                'gateway_transaction_id' => $checkoutSession['id'],
-                'payment_gateway_response' => $checkoutSession,
+            // Create payment record with proof
+            $payment = Payment::create([
+                'order_id' => $order->id,
+                'amount_paid' => $orderSummary['total_amount'],
+                'payment_method_used' => 'online_payment',
+                'status' => 'pending',
+                'payment_proof_url' => $paymentProofPath,
+                'customer_reference_code' => $validated['customer_reference_code'],
+                'admin_verification_status' => 'pending_review',
             ]);
+            
+            // Log order status
+            $this->logOrderStatusChange(
+                $order->id, 
+                'pending_payment', 
+                'Payment proof submitted, awaiting admin verification', 
+                Auth::id()
+            );
             
             DB::commit();
             
+            // Clear order summary from session
             session()->forget('order_summary');
             
-            return redirect()->away($checkoutSession['checkout_url']);
+            // Send notifications
+            $this->notifyCustomerPaymentSubmitted($order);
+            $this->notifyAdminPaymentReview($order, $payment);
+            
+            return redirect()->route('customer.orders.show', $order->id)
+                ->with('success', 'Payment proof submitted successfully! Your payment is being verified by our admin team.');
             
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Payment processing failed: ' . $e->getMessage(), [
+            
+            Log::error('GCash payment proof submission failed: ' . $e->getMessage(), [
                 'user_id' => Auth::id(),
                 'exception' => $e
             ]);
             
             return redirect()->back()
-                ->with('error', 'Payment processing failed. Please try again.');
+                ->withInput()
+                ->with('error', 'Failed to submit payment proof. Please try again.');
         }
     }
     
@@ -163,161 +270,61 @@ class CustomerPaymentController extends Controller
         }
     }
     
-    /**
-     * Handle PayMongo payment success callback
-     */
-    public function paymentSuccess(Request $request)
-    {
-        try {
-            $user = Auth::user();
-            
-            // Find the most recent pending payment order for this user
-            $order = Order::where('customer_user_id', $user->id)
-                ->where('payment_method', 'online_payment')
-                ->where('status', 'pending_payment')
-                ->latest()
-                ->first();
-            
-            if (!$order) {
-                return redirect()->route('customer.orders.index')
-                    ->with('error', 'Order not found.');
-            }
-            
-            // Verify payment status with PayMongo
-            $paymentStatus = $this->verifyPayMongoPayment($order->payment_intent_id);
-            
-            if ($paymentStatus === 'paid') {
-                DB::beginTransaction();
-                
-                try {
-                    // Update order status
-                    $order->update([
-                        'status' => 'processing',
-                        'payment_status' => 'paid'
-                    ]);
-                    
-                    // Update payment record
-                    $payment = $order->payment;
-                    if ($payment) {
-                        $payment->update([
-                            'status' => 'completed',
-                            'payment_processed_at' => now(),
-                        ]);
-                    }
-                    
-                    DB::commit();
-                    
-                    // Trigger order finalization after successful payment
-                    $fulfillmentController = new CustomerOrderFulfillmentController();
-                    $fulfillmentController->finalizeOrder($order);
-                    
-                    return redirect()->route('customer.orders.show', $order->id)
-                        ->with('success', 'Payment successful! Your order is now being processed.');
-                    
-                } catch (Exception $e) {
-                    DB::rollBack();
-                    throw $e;
-                }
-            } else {
-                return redirect()->route('customer.orders.show', $order->id)
-                    ->with('warning', 'Payment verification pending. Please contact support if needed.');
-            }
-            
-        } catch (Exception $e) {
-            Log::error('Payment success callback failed: ' . $e->getMessage());
-            
-            return redirect()->route('customer.orders.index')
-                ->with('error', 'Payment verification failed. Please contact support.');
-        }
-    }
+    // ==================== PRIVATE HELPER METHODS ====================
     
     /**
-     * Handle PayMongo payment failure callback
+     * Process checkout form data into order summary
      */
-    public function paymentFailed(Request $request)
+    private function processCheckoutForm(Request $request): array
     {
         $user = Auth::user();
         
-        $order = Order::where('customer_user_id', $user->id)
-            ->where('payment_method', 'online_payment')
-            ->where('status', 'pending_payment')
-            ->latest()
-            ->first();
+        $validated = $request->validate([
+            'delivery_address_id' => 'required|exists:saved_addresses,id',
+            'payment_method' => 'required|in:online_payment',
+            'rider_selection_type' => 'required|in:choose_rider,system_assign',
+            'selected_rider_id' => 'required_if:rider_selection_type,choose_rider|nullable|exists:users,id'
+        ]);
         
-        if ($order) {
-            $order->update([
-                'status' => 'failed',
-                'payment_status' => 'failed'
-            ]);
-            
-            $payment = $order->payment;
-            if ($payment) {
-                $payment->update(['status' => 'failed']);
-            }
-            
-            return redirect()->route('customer.orders.show', $order->id)
-                ->with('error', 'Payment failed. You can try placing the order again.');
+        // Get cart items and delivery address
+        $cartItems = ShoppingCartItem::with(['product.vendor', 'product'])
+            ->where('user_id', $user->id)
+            ->get();
+        
+        if ($cartItems->isEmpty()) {
+            throw new Exception('Cart is empty');
         }
         
-        return redirect()->route('checkout.index')
-            ->with('error', 'Payment was cancelled or failed. Please try again.');
-    }
-    
-    // ==================== PRIVATE HELPER METHODS ====================
-    
-   /**
- * Process checkout form data into order summary
- */
-private function processCheckoutForm(Request $request): array
-{
-    $user = Auth::user();
-    
-    $validated = $request->validate([
-        'delivery_address_id' => 'required|exists:saved_addresses,id',
-        'payment_method' => 'required|in:online_payment',
-         'rider_selection_type' => 'required|in:choose_rider,system_assign',
-        'selected_rider_id' => 'required_if:rider_selection_type,choose_rider|nullable|exists:users,id'
-    ]);
-    
-    // Get cart items and delivery address
-    $cartItems = ShoppingCartItem::with(['product.vendor', 'product'])
-        ->where('user_id', $user->id)
-        ->get();
-    
-    if ($cartItems->isEmpty()) {
-        throw new Exception('Cart is empty');
-    }
-    
-    $deliveryAddress = SavedAddress::with('district')
-        ->where('id', $validated['delivery_address_id'])
-        ->where('user_id', $user->id)
-        ->first();
-    
-      // Process rider selection
+        $deliveryAddress = SavedAddress::with('district')
+            ->where('id', $validated['delivery_address_id'])
+            ->where('user_id', $user->id)
+            ->first();
+        
+        // Process rider selection
         $selectedRider = null;
         if ($validated['rider_selection_type'] === 'choose_rider') {
             $selectedRider = User::find($validated['selected_rider_id']);
         }
+        
+        // Calculate totals
+        $subtotal = $cartItems->sum('subtotal');
+        $deliveryFee = $deliveryAddress->district->delivery_fee;
+        $totalAmount = $subtotal + $deliveryFee;
+        
+        return [
+            'cart_items' => $cartItems,
+            'delivery_address' => $deliveryAddress,
+            'selected_rider' => $selectedRider,
+            'payment_method' => 'online_payment',
+            'rider_selection_type' => $validated['rider_selection_type'],
+            'subtotal' => $subtotal,
+            'delivery_fee' => $deliveryFee,
+            'total_amount' => $totalAmount,
+            'item_count' => $cartItems->count(),
+            'has_budget_items' => $cartItems->where('customer_budget', '!=', null)->count() > 0
+        ];
+    }
     
-    // Calculate totals
-    $subtotal = $cartItems->sum('subtotal');
-    $deliveryFee = $deliveryAddress->district->delivery_fee;
-    $totalAmount = $subtotal + $deliveryFee;
-    
-    return [
-        'cart_items' => $cartItems,
-        'delivery_address' => $deliveryAddress,
-        'selected_rider' => $selectedRider,
-        'payment_method' => 'online_payment',
-        'rider_selection_type' => $validated['rider_selection_type'],
-        'subtotal' => $subtotal,
-        'delivery_fee' => $deliveryFee,
-        'total_amount' => $totalAmount,
-        'item_count' => $cartItems->count(),
-        'has_budget_items' => $cartItems->where('customer_budget', '!=', null)->count() > 0
-    ];
-}
-
     /**
      * Create order record from session data
      */
@@ -373,88 +380,67 @@ private function processCheckoutForm(Request $request): array
     }
     
     /**
-     * Create PayMongo checkout session
+     * Log order status change
      */
-    private function createPayMongoCheckout(Order $order, array $orderSummary): ?array
+    private function logOrderStatusChange($orderId, $status, $notes = null, $updatedByUserId = null)
     {
         try {
-            $secretKey = config('services.paymongo.secret_key');
-            
-            if (empty($secretKey)) {
-                throw new Exception('Payment gateway not configured');
-            }
-            
-            $payloadData = [
-                'data' => [
-                    'attributes' => [
-                        'cancel_url' => route('payment.failed'),
-                        'success_url' => route('payment.success'),
-                        'line_items' => [
-                            [
-                                'name' => 'Order #' . $order->id . ' - ' . $orderSummary['item_count'] . ' items',
-                                'quantity' => 1,
-                                'amount' => (int)($orderSummary['total_amount'] * 100), // Convert to centavos
-                                'currency' => 'PHP',
-                                'description' => 'Food delivery order',
-                            ]
-                        ],
-                        'payment_method_types' => ['card', 'gcash', 'grab_pay', 'paymaya'],
-                        'description' => 'Food Delivery Order Payment',
-                        'reference_number' => (string)$order->id,
-                    ]
-                ]
-            ];
-
-            $response = Http::withBasicAuth($secretKey, '')
-                ->timeout(30)
-                ->post('https://api.paymongo.com/v1/checkout_sessions', $payloadData);
-            
-            if ($response->successful()) {
-                $data = $response->json();
-                return [
-                    'id' => $data['data']['id'],
-                    'checkout_url' => $data['data']['attributes']['checkout_url'],
-                ];
-            }
-            
-            Log::error('PayMongo API Error', [
-                'status' => $response->status(),
-                'response' => $response->body()
+            \App\Models\OrderStatusHistory::create([
+                'order_id' => $orderId,
+                'status' => $status,
+                'notes' => $notes,
+                'updated_by_user_id' => $updatedByUserId,
+                'created_at' => now(),
             ]);
-            
-            return null;
-            
-        } catch (Exception $e) {
-            Log::error('PayMongo checkout creation failed: ' . $e->getMessage());
-            return null;
+        } catch (\Exception $e) {
+            Log::error("Failed to log order status change: " . $e->getMessage());
         }
     }
     
     /**
-     * Verify PayMongo payment status
+     * Notify customer that payment proof was submitted
      */
-    private function verifyPayMongoPayment(string $checkoutSessionId): string
+    private function notifyCustomerPaymentSubmitted(Order $order)
     {
-        try {
-            $response = Http::withBasicAuth(config('services.paymongo.secret_key'), '')
-                ->get("https://api.paymongo.com/v1/checkout_sessions/{$checkoutSessionId}");
-            
-            if ($response->successful()) {
-                $data = $response->json();
-                $status = $data['data']['attributes']['payment_intent']['attributes']['status'] ?? 'failed';
-                
-                return match($status) {
-                    'succeeded' => 'paid',
-                    'processing' => 'pending',
-                    default => 'failed'
-                };
-            }
-            
-            return 'failed';
-            
-        } catch (Exception $e) {
-            Log::error('PayMongo verification failed: ' . $e->getMessage());
-            return 'failed';
+        $fulfillmentController = new CustomerOrderFulfillmentController();
+        $fulfillmentController->createNotification(
+            $order->customer_user_id,
+            'payment_submitted',
+            'Payment Proof Submitted',
+            [
+                'order_id' => $order->id,
+                'message' => 'Your payment proof has been submitted and is awaiting verification by our admin team.'
+            ],
+            Order::class,
+            $order->id
+        );
+    }
+    
+    /**
+     * Notify admin of new payment to review
+     */
+    private function notifyAdminPaymentReview(Order $order, Payment $payment)
+    {
+        // Get all admin users
+        $adminUsers = User::where('role', 'admin')->where('is_active', true)->get();
+        
+        $fulfillmentController = new CustomerOrderFulfillmentController();
+        
+        foreach ($adminUsers as $admin) {
+            $fulfillmentController->createNotification(
+                $admin->id,
+                'payment_review_required',
+                'New Payment Proof to Review',
+                [
+                    'order_id' => $order->id,
+                    'payment_id' => $payment->id,
+                    'customer_name' => $order->customer->name,
+                    'amount' => '₱' . number_format($order->final_total_amount, 2),
+                    'message' => 'A new payment proof has been submitted and requires verification.'
+                ],
+                Payment::class,
+                $payment->id
+            );
         }
     }
 }

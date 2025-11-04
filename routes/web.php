@@ -132,18 +132,17 @@ Route::middleware(['auth'])->group(function () {
         ->name('payment.confirmation');
 
     // Payment processing routes
-    Route::post('/payment/process-online', [CustomerPaymentController::class, 'processOnlinePayment'])
-        ->name('payment.process-online');
     Route::post('/payment/process-cod', [CustomerPaymentController::class, 'processCOD'])
         ->name('payment.process-cod');
 });
 
-// PayMongo Callback Routes (no auth middleware - external callbacks)
-Route::prefix('payment')->name('payment.')->group(function () {
-    Route::get('/success', [CustomerPaymentController::class, 'paymentSuccess'])
-        ->name('success');
-    Route::get('/failed', [CustomerPaymentController::class, 'paymentFailed'])
-        ->name('failed');
+// Manual GCash Payment Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/payment/gcash-instructions', [CustomerPaymentController::class, 'showGCashInstructions'])
+        ->name('payment.gcash-instructions');
+    
+    Route::post('/payment/gcash-submit-proof', [CustomerPaymentController::class, 'submitGCashProof'])
+        ->name('payment.gcash-submit-proof');
 });
 
 // Customer Order Routes

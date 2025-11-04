@@ -16,7 +16,8 @@
 
         <!-- Header Actions -->
         <div class="flex items-center space-x-3">
-          
+            <!-- Notifications -->
+            @include('components.notification')
             
             <!-- Profile Section -->
             <div class="relative">

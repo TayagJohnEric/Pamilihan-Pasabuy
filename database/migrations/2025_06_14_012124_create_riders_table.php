@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('vehicle_type')->nullable();
             // ✅ ADDED for new workflow
             $table->string('gcash_number')->nullable()->unique(); // GCash mobile number (unique is good)
-            $table->string('gcash_qr_path')->nullable();               // Image filename/path of GCash QR code
+            $table->string('gcash_qr_path')->nullable();          // Image filename/path of GCash QR code
             $table->string('gcash_name')->nullable();             // GCash account holder name
             $table->decimal('current_latitude', 10, 8)->nullable();
             $table->decimal('current_longitude', 11, 8)->nullable();
