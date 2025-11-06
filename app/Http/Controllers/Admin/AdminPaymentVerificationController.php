@@ -32,8 +32,7 @@ class AdminPaymentVerificationController extends Controller
                 'order.rider.user',
                 'order.deliveryAddress'
             ])
-            ->where('payment_method_used', 'online_payment')
-            ->where('admin_verification_status', 'pending_review');
+            ->where('payment_method_used', 'online_payment');
 
         // Filter by status
         $filterStatus = $request->get('filter_status', 'pending_review');

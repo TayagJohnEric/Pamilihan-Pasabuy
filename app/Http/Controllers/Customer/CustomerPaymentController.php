@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Customer\CustomerOrderFulfillmentController;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\SavedAddress;
@@ -107,7 +108,7 @@ class CustomerPaymentController extends Controller
             // Option 1: Get first available rider with GCash details
             $availableRider = Rider::whereNotNull('gcash_number')
                 ->where('is_available', true)
-                ->where('verification_status', 'approved')
+                ->where('verification_status', 'verified')
                 ->with('user')
                 ->first();
             
@@ -138,24 +139,50 @@ class CustomerPaymentController extends Controller
      */
     public function submitGCashProof(Request $request)
     {
+        Log::info('GCash payment proof submission started', [
+            'user_id' => Auth::id(),
+            'has_file' => $request->hasFile('payment_proof'),
+            'request_all' => $request->except('payment_proof')
+        ]);
+        
         $orderSummary = session('order_summary');
         
+        Log::info('Order summary from session', [
+            'has_summary' => !is_null($orderSummary),
+            'payment_method' => $orderSummary['payment_method'] ?? 'N/A',
+            'summary_keys' => $orderSummary ? array_keys($orderSummary) : []
+        ]);
+        
         if (!$orderSummary || $orderSummary['payment_method'] !== 'online_payment') {
+            Log::warning('Invalid payment session detected', [
+                'has_summary' => !is_null($orderSummary),
+                'payment_method' => $orderSummary['payment_method'] ?? 'N/A'
+            ]);
             return redirect()->route('checkout.index')
                 ->with('error', 'Invalid payment session. Please try again.');
         }
         
         // Validate request
-        $validated = $request->validate([
-            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:5120', // 5MB max
-            'customer_reference_code' => 'nullable|string|max:100',
-            'special_instructions' => 'nullable|string|max:500',
-        ], [
-            'payment_proof.required' => 'Please upload a screenshot of your payment.',
-            'payment_proof.image' => 'Payment proof must be an image file.',
-            'payment_proof.mimes' => 'Payment proof must be a JPEG, PNG, or JPG file.',
-            'payment_proof.max' => 'Payment proof must not exceed 5MB.',
-        ]);
+        try {
+            $validated = $request->validate([
+                'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:5120', // 5MB max
+                'customer_reference_code' => 'nullable|string|max:100',
+                'special_instructions' => 'nullable|string|max:500',
+            ], [
+                'payment_proof.required' => 'Please upload a screenshot of your payment.',
+                'payment_proof.image' => 'Payment proof must be an image file.',
+                'payment_proof.mimes' => 'Payment proof must be a JPEG, PNG, or JPG file.',
+                'payment_proof.max' => 'Payment proof must not exceed 5MB.',
+            ]);
+            
+            Log::info('Validation passed', ['validated' => array_keys($validated)]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed', [
+                'errors' => $e->errors(),
+                'user_id' => Auth::id()
+            ]);
+            throw $e;
+        }
         
         DB::beginTransaction();
         
@@ -167,8 +194,12 @@ class CustomerPaymentController extends Controller
                 $request->input('special_instructions')
             );
             
+            Log::info('Order created successfully', ['order_id' => $order->id]);
+            
             // Create order items
             $this->createOrderItems($order, $orderSummary['cart_items']);
+            
+            Log::info('Order items created', ['order_id' => $order->id, 'item_count' => $orderSummary['cart_items']->count()]);
             
             // Upload payment proof
             $paymentProofPath = null;
@@ -176,6 +207,8 @@ class CustomerPaymentController extends Controller
                 $file = $request->file('payment_proof');
                 $filename = 'payment_proof_' . $order->id . '_' . time() . '.' . $file->getClientOriginalExtension();
                 $paymentProofPath = $file->storeAs('payment_proofs', $filename, 'public');
+                
+                Log::info('Payment proof uploaded', ['path' => $paymentProofPath]);
             }
             
             // Create payment record with proof
@@ -188,6 +221,8 @@ class CustomerPaymentController extends Controller
                 'customer_reference_code' => $validated['customer_reference_code'],
                 'admin_verification_status' => 'pending_review',
             ]);
+            
+            Log::info('Payment record created', ['payment_id' => $payment->id, 'status' => $payment->admin_verification_status]);
             
             // Log order status
             $this->logOrderStatusChange(
@@ -332,9 +367,16 @@ class CustomerPaymentController extends Controller
     {
         $user = Auth::user();
         
+        // For online payment orders, rider assignment happens later when items are ready_for_pickup
+        // For COD orders, we can set rider preference but actual assignment still happens when items are ready
+        // This ensures rider notification is only sent after vendor prepares items
+        
         return Order::create([
             'customer_user_id' => $user->id,
-            'rider_user_id' => $orderSummary['selected_rider']->id ?? null,
+            // Rider will be assigned later when vendor marks items as ready_for_pickup
+            // This ensures rider notification only happens after items are prepared
+            'rider_user_id' => null,
+            // Store customer's rider preference (if any) to use during assignment
             'preferred_rider_id' => $orderSummary['rider_selection_type'] === 'choose_rider' 
                 ? $orderSummary['selected_rider']->id : null,
             'delivery_address_id' => $orderSummary['delivery_address']->id,
