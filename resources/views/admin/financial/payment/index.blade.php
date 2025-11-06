@@ -1,270 +1,277 @@
 @extends('layout.admin')
 
-@section('title', 'Payments Management')
+@section('title', 'Payment Verification - Admin')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-    <div class="max-w-[90rem] mx-auto px-4 py-8">
-        <!-- Header Section with Gradient Background -->
-        <div class="bg-gradient-to-r from-emerald-600 via-emerald-600 to-teal-600 rounded-xl shadow-lg p-8 mb-8">
-            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center text-white">
-                <div class="mb-6 lg:mb-0">
-                    <h2 class="text-2xl lg:text-2xl font-bold text-white drop-shadow-sm">
-                        Payments Management
-                    </h2>
-                    <p class="text-emerald-100 text-md">
-                        Manage and filter all payments
+<!-- Toast Notification Container -->
+<div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2 max-w-sm w-full pointer-events-none"></div>
+
+<div class="min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+        
+        <!-- Page Header -->
+        <div class="mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Payment Verification</h1>
+                    <p class="text-sm lg:text-base text-gray-600 mt-1">
+                        Review and verify customer payment proofs
                     </p>
                 </div>
-                <div class="bg-white/20 backdrop-blur-sm rounded-xl px-6 py-4 border border-white/20">
-                    <div class="flex items-center">
-                        <svg class="w-6 h-6 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                        </svg>
-                        <div>
-                            <div class="text-2xl font-bold text-white">{{ $payments->total() }}</div>
-                            <div class="text-emerald-100 text-sm">Total Payments</div>
-                        </div>
+                
+                <!-- Quick Stats -->
+                <div class="hidden sm:flex items-center space-x-4">
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2">
+                        <p class="text-xs text-yellow-600 font-medium">Pending</p>
+                        <p class="text-2xl font-bold text-yellow-900">{{ $stats['pending_count'] }}</p>
+                    </div>
+                    <div class="bg-green-50 border border-green-200 rounded-lg px-4 py-2">
+                        <p class="text-xs text-green-600 font-medium">Approved Today</p>
+                        <p class="text-2xl font-bold text-green-900">{{ $stats['approved_today'] }}</p>
+                    </div>
+                    <div class="bg-red-50 border border-red-200 rounded-lg px-4 py-2">
+                        <p class="text-xs text-red-600 font-medium">Rejected Today</p>
+                        <p class="text-2xl font-bold text-red-900">{{ $stats['rejected_today'] }}</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Main Content Card -->
-        <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
-            <!-- Filters Section -->
-            <div class="bg-gradient-to-r from-gray-50 to-gray-100 p-6">
-                <form method="GET" action="{{ route('admin.payments.index') }}" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <!-- Search Field -->
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Search Rider/Vendor</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
-                                </div>
-                                <input type="text" 
-                                       name="search" 
-                                       value="{{ request('search') }}"
-                                       placeholder="Search by rider or vendor name..."
-                                       class="pl-10 w-full rounded-xl border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 transition-colors duration-200">
-                            </div>
+        <!-- Filters and Search -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+            <form method="GET" action="{{ route('admin.payments.pending') }}" class="flex flex-col sm:flex-row gap-4">
+                <!-- Search Bar -->
+                <div class="flex-1">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
                         </div>
-
-                        <!-- Payment Method Filter -->
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Payment Method</label>
-                            <select name="payment_method_used" 
-                                    class="w-full rounded-xl border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 transition-colors duration-200">
-                                <option value="">All Methods</option>
-                                <option value="online_payment" 
-                                    {{ request('payment_method_used') === 'online_payment' ? 'selected' : '' }}>
-                                    Online Payment
-                                </option>
-                                <option value="cod" 
-                                    {{ request('payment_method_used') === 'cod' ? 'selected' : '' }}>
-                                    Cash on Delivery
-                                </option>
-                            </select>
-                        </div>
-
-                        <!-- Status Filter -->
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-                            <select name="status" 
-                                    class="w-full rounded-xl border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 transition-colors duration-200">
-                                <option value="">All Statuses</option>
-                                <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
-                                <option value="failed" {{ request('status') === 'failed' ? 'selected' : '' }}>Failed</option>
-                                <option value="refunded" {{ request('status') === 'refunded' ? 'selected' : '' }}>Refunded</option>
-                            </select>
-                        </div>
-
-                        <!-- Filter Actions -->
-                        <div class="flex items-end space-x-2">
-                            <button type="submit" 
-                                    class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 shadow-md hover:shadow-lg">
-                                Search
-                            </button>
-                            <a href="{{ route('admin.payments.index') }}" 
-                               class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 text-center shadow-md hover:shadow-lg">
-                                Reset
-                            </a>
-                        </div>
+                        <input type="text" 
+                               name="search" 
+                               value="{{ request('search') }}"
+                               class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                               placeholder="Search by order ID or customer name...">
                     </div>
-                </form>
-            </div>
-
-            <!-- Payments Table -->
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-100">
-                    <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
-                        <tr>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Order ID</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Amount Paid</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden md:table-cell">Method</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden lg:table-cell">Processed At</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden xl:table-cell">Rider</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden xl:table-cell">Vendor</th>
-                            <th class="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-50">
-                        @forelse($payments as $payment)
-                            <tr class="hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-teal-50/50 transition-all duration-200 group">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full flex items-center justify-center shadow-md">
-                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors duration-200">
-                                                #{{ $payment->order_id }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <svg class="w-4 h-4 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                                        </svg>
-                                        <span class="text-sm font-semibold text-gray-900">
-                                            ₱{{ number_format($payment->amount_paid, 2) }}
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap hidden md:table-cell">
-                                    <div class="flex items-center">
-                                        @if($payment->payment_method_used == 'cod')
-                                            <svg class="w-4 h-4 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                                            </svg>
-                                        @else
-                                            <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                                            </svg>
-                                        @endif
-                                        <span class="text-sm text-gray-700 capitalize">
-                                            {{ str_replace('_', ' ', $payment->payment_method_used) }}
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full border
-                                        @if($payment->status === 'completed') bg-green-100 text-green-800 border-green-200
-                                        @elseif($payment->status === 'pending') bg-yellow-100 text-yellow-800 border-yellow-200
-                                        @elseif($payment->status === 'failed') bg-red-100 text-red-800 border-red-200
-                                        @elseif($payment->status === 'refunded') bg-gray-100 text-gray-800 border-gray-200
-                                        @endif">
-                                        <div class="w-2 h-2 rounded-full mr-2 
-                                            @if($payment->status === 'completed') bg-green-500
-                                            @elseif($payment->status === 'pending') bg-yellow-500
-                                            @elseif($payment->status === 'failed') bg-red-500
-                                            @elseif($payment->status === 'refunded') bg-gray-500
-                                            @endif"></div>
-                                        {{ ucfirst($payment->status) }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap hidden lg:table-cell">
-                                    <div class="flex items-center text-sm text-gray-500">
-                                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                        </svg>
-                                        <span>
-                                            {{ $payment->payment_processed_at ? $payment->payment_processed_at->format('Y-m-d H:i') : 'N/A' }}
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap hidden xl:table-cell">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-8 w-8 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
-                                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="ml-3">
-                                            <div class="text-sm text-gray-700">
-                                                @if($payment->order && $payment->order->rider)
-                                                    {{ $payment->order->rider->first_name }} {{ $payment->order->rider->last_name }}
-                                                @else
-                                                    N/A
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap hidden xl:table-cell">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-8 w-8 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center">
-                                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="ml-3">
-                                            <div class="text-sm text-gray-700">
-                                                @php
-                                                    $vendors = collect();
-                                                    if($payment->order && $payment->order->orderItems) {
-                                                        foreach($payment->order->orderItems as $item) {
-                                                            if($item->product && $item->product->vendor) {
-                                                                $vendors->push($item->product->vendor->vendor_name);
-                                                            }
-                                                        }
-                                                    }
-                                                    $uniqueVendors = $vendors->unique();
-                                                @endphp
-                                                @if($uniqueVendors->count() > 0)
-                                                    {{ $uniqueVendors->implode(', ') }}
-                                                @else
-                                                    N/A
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <a href="#" class="inline-flex items-center justify-center px-4 py-2 text-xs font-medium text-emerald-600 hover:text-white hover:bg-emerald-600 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md border border-emerald-200">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                        </svg>
-                                        View
-                                    </a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8" class="px-6 py-16 text-center">
-                                    <div class="flex flex-col items-center justify-center">
-                                        <div class="w-24 h-24 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center mb-6 shadow-lg">
-                                            <svg class="w-12 h-12 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                                            </svg>
-                                        </div>
-                                        <h3 class="text-xl font-semibold text-gray-800 mb-2">No payments found</h3>
-                                        <p class="text-gray-600 max-w-md text-center">
-                                            No payments match your current filter criteria. Try adjusting your search parameters or check back later for new payments.
-                                        </p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            <div class="bg-gray-50 px-6 py-4 border-t border-gray-100">
-                {{ $payments->links() }}
-            </div>
+                </div>
+                
+                <!-- Status Filter -->
+                <div class="w-full sm:w-48">
+                    <select name="filter_status" 
+                            class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            onchange="this.form.submit()">
+                        <option value="pending_review" {{ $filterStatus === 'pending_review' ? 'selected' : '' }}>Pending Review</option>
+                        <option value="approved" {{ $filterStatus === 'approved' ? 'selected' : '' }}>Approved</option>
+                        <option value="rejected" {{ $filterStatus === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                        <option value="all" {{ $filterStatus === 'all' ? 'selected' : '' }}>All Payments</option>
+                    </select>
+                </div>
+                
+                <!-- Search Button -->
+                <button type="submit" 
+                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Search
+                </button>
+                
+                <!-- Clear Button -->
+                @if(request('search') || request('filter_status'))
+                    <a href="{{ route('admin.payments.pending') }}" 
+                       class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-center">
+                        Clear
+                    </a>
+                @endif
+            </form>
         </div>
+
+        <!-- Payments List -->
+        @if($payments->isEmpty())
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <h3 class="text-lg font-medium text-gray-900 mb-1">No Payments Found</h3>
+                <p class="text-gray-600">
+                    @if(request('search'))
+                        No payments match your search criteria.
+                    @else
+                        There are no pending payment verifications at the moment.
+                    @endif
+                </p>
+            </div>
+        @else
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rider</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @foreach($payments as $payment)
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <span class="font-medium text-gray-900">#{{ $payment->order_id }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            @if($payment->order->customer->profile_image_url)
+                                                <img src="{{ asset('storage/' . $payment->order->customer->profile_image_url) }}" 
+                                                     alt="{{ $payment->order->customer->name }}"
+                                                     class="w-8 h-8 rounded-full object-cover mr-3">
+                                            @else
+                                                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                                                    <span class="text-xs font-medium text-gray-600">
+                                                        {{ substr($payment->order->customer->first_name, 0, 1) }}{{ substr($payment->order->customer->last_name, 0, 1) }}
+                                                    </span>
+                                                </div>
+                                            @endif
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">{{ $payment->order->customer->name }}</p>
+                                                <p class="text-xs text-gray-500">{{ $payment->order->customer->email }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="text-lg font-bold text-gray-900">₱{{ number_format($payment->amount_paid, 2) }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($payment->order->rider)
+                                            <p class="text-sm text-gray-900">{{ $payment->order->rider->name }}</p>
+                                        @else
+                                            <span class="text-xs text-gray-500 italic">Not assigned</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($payment->customer_reference_code)
+                                            <code class="text-xs bg-gray-100 px-2 py-1 rounded">{{ $payment->customer_reference_code }}</code>
+                                        @else
+                                            <span class="text-xs text-gray-400">N/A</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @php
+                                            $statusColors = [
+                                                'pending_review' => 'bg-yellow-100 text-yellow-800',
+                                                'approved' => 'bg-green-100 text-green-800',
+                                                'rejected' => 'bg-red-100 text-red-800',
+                                            ];
+                                            $statusLabels = [
+                                                'pending_review' => 'Pending',
+                                                'approved' => 'Approved',
+                                                'rejected' => 'Rejected',
+                                            ];
+                                        @endphp
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $statusColors[$payment->admin_verification_status] ?? 'bg-gray-100 text-gray-800' }}">
+                                            {{ $statusLabels[$payment->admin_verification_status] ?? ucfirst($payment->admin_verification_status) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ $payment->created_at->diffForHumans() }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <a href="{{ route('admin.payments.review', $payment->id) }}" 
+                                           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                            Review
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                @if($payments->hasPages())
+                    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                        {{ $payments->links() }}
+                    </div>
+                @endif
+            </div>
+        @endif
     </div>
 </div>
+
+<!-- JavaScript -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+// Toast Notification System
+function createToast(message, type = 'success', duration = 4000) {
+    const toastContainer = $('#toast-container');
+    const toastId = 'toast-' + Date.now();
+    
+    const icons = {
+        success: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>`,
+        error: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>`,
+        info: `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>`
+    };
+
+    const colors = {
+        success: 'bg-green-50 border-green-200 text-green-800',
+        error: 'bg-red-50 border-red-200 text-red-800',
+        info: 'bg-blue-50 border-blue-200 text-blue-800'
+    };
+
+    const iconColors = {
+        success: 'text-green-500',
+        error: 'text-red-500',
+        info: 'text-blue-500'
+    };
+
+    const toast = $(`
+        <div id="${toastId}" class="transform transition-all duration-300 ease-out translate-x-full opacity-0 pointer-events-auto">
+            <div class="w-full max-w-sm ${colors[type]} border rounded-lg shadow-lg">
+                <div class="p-4">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 ${iconColors[type]}">${icons[type]}</div>
+                        <div class="ml-3 w-0 flex-1 pt-0.5">
+                            <p class="text-sm font-medium leading-5">${message}</p>
+                        </div>
+                        <button type="button" onclick="removeToast('${toastId}')" class="ml-4 flex-shrink-0 inline-flex rounded-md text-gray-400 hover:text-gray-600 focus:outline-none">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `);
+
+    toastContainer.append(toast);
+    setTimeout(() => $(`#${toastId}`).removeClass('translate-x-full opacity-0').addClass('translate-x-0 opacity-100'), 100);
+    setTimeout(() => removeToast(toastId), duration);
+}
+
+window.removeToast = function(toastId) {
+    const toast = $(`#${toastId}`);
+    if (toast.length) {
+        toast.removeClass('translate-x-0 opacity-100').addClass('translate-x-full opacity-0');
+        setTimeout(() => toast.remove(), 300);
+    }
+};
+
+// Session messages
+@if(session('success'))
+    createToast("{{ session('success') }}", 'success');
+@endif
+@if(session('error'))
+    createToast("{{ session('error') }}", 'error');
+@endif
+@if(session('info'))
+    createToast("{{ session('info') }}", 'info');
+@endif
+</script>
 @endsection

@@ -423,6 +423,8 @@ use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\AdminPayoutController;
 use App\Http\Controllers\Admin\AdminSystemSettingController;
 use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\AdminPaymentVerificationController;
+
 
 
 
@@ -568,4 +570,20 @@ Route::get('profile', [AdminProfileController::class, 'edit'])->name('admin.prof
 Route::put('profile', [AdminProfileController::class, 'update'])->name('admin.profile.update');
 Route::get('password', [AdminProfileController::class, 'editPassword'])->name('admin.password.edit');
 Route::put('password', [AdminProfileController::class, 'updatePassword'])->name('admin.password.update');
+});
+
+
+// Admin Payment Verification Routes
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/payments/pending', [AdminPaymentVerificationController::class, 'index'])
+        ->name('payments.pending');
+    
+    Route::get('/payments/{payment}/review', [AdminPaymentVerificationController::class, 'show'])
+        ->name('payments.review');
+    
+    Route::post('/payments/{payment}/approve', [AdminPaymentVerificationController::class, 'approve'])
+        ->name('payments.approve');
+    
+    Route::post('/payments/{payment}/reject', [AdminPaymentVerificationController::class, 'reject'])
+        ->name('payments.reject');
 });
