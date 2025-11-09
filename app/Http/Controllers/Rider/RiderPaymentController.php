@@ -161,12 +161,22 @@ class RiderPaymentController extends Controller
             
             DB::commit();
             
-            // Send notifications
-            $this->notifyCustomerPaymentVerified($payment);
-            $this->notifyAdminPaymentVerified($payment);
-            $this->notifyVendorsReadyForPickup($payment->order);
+            // Send notifications (outside transaction to avoid rollback issues)
+            try {
+                $this->notifyCustomerPaymentVerified($payment);
+                $this->notifyAdminPaymentVerified($payment);
+                $this->notifyVendorsReadyForPickup($payment->order);
+            } catch (\Exception $notificationError) {
+                // Log notification errors but don't fail the verification
+                Log::warning('Payment verified but notification failed', [
+                    'payment_id' => $payment->id,
+                    'error' => $notificationError->getMessage()
+                ]);
+            }
             
-            return redirect()->route('rider.payments.index')
+            // Clear any previous errors and redirect to order details page
+            session()->forget('error');
+            return redirect()->route('rider.orders.show', $payment->order->id)
                 ->with('success', 'Payment verified successfully! You can now proceed with pickup and delivery.');
             
         } catch (\Exception $e) {
@@ -174,11 +184,12 @@ class RiderPaymentController extends Controller
             Log::error('Rider payment verification failed: ' . $e->getMessage(), [
                 'payment_id' => $payment->id,
                 'rider_id' => $rider->id,
-                'exception' => $e
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
             
-            return redirect()->back()
-                ->with('error', 'Failed to verify payment. Please try again.');
+            return redirect()->route('rider.orders.show', $payment->order->id)
+                ->with('error', 'Payment verification failed: ' . $e->getMessage());
         }
     }
     
@@ -228,11 +239,21 @@ class RiderPaymentController extends Controller
             
             DB::commit();
             
-            // Send notifications
-            $this->notifyCustomerPaymentRejected($payment, $validated['rejection_reason']);
-            $this->notifyAdminPaymentDispute($payment, $validated['rejection_reason']);
+            // Send notifications (outside transaction to avoid rollback issues)
+            try {
+                $this->notifyCustomerPaymentRejected($payment, $validated['rejection_reason']);
+                $this->notifyAdminPaymentDispute($payment, $validated['rejection_reason']);
+            } catch (\Exception $notificationError) {
+                // Log notification errors but don't fail the rejection
+                Log::warning('Payment rejected but notification failed', [
+                    'payment_id' => $payment->id,
+                    'error' => $notificationError->getMessage()
+                ]);
+            }
             
-            return redirect()->route('rider.payments.index')
+            // Clear any previous errors and redirect to order details page
+            session()->forget('error');
+            return redirect()->route('rider.orders.show', $payment->order->id)
                 ->with('success', 'Payment marked as not received. Customer and admin have been notified.');
             
         } catch (\Exception $e) {
@@ -240,11 +261,12 @@ class RiderPaymentController extends Controller
             Log::error('Rider payment rejection failed: ' . $e->getMessage(), [
                 'payment_id' => $payment->id,
                 'rider_id' => $rider->id,
-                'exception' => $e
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
             
-            return redirect()->back()
-                ->with('error', 'Failed to reject payment. Please try again.');
+            return redirect()->route('rider.orders.show', $payment->order->id)
+                ->with('error', 'Payment rejection failed: ' . $e->getMessage());
         }
     }
     

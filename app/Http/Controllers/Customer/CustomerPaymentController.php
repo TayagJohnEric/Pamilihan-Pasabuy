@@ -278,12 +278,24 @@ class CustomerPaymentController extends Controller
             // Create or update payment record with proof
             $payment = Payment::where('order_id', $order->id)->first();
             
+            $isResubmission = false;
+            
             if ($payment) {
-                // Update existing payment record
+                $isResubmission = $payment->rider_verification_status === 'rejected';
+                
+                // Update existing payment record (reset rider verification status for re-submission)
                 $payment->update([
                     'payment_proof_url' => $paymentProofPath,
                     'customer_reference_code' => $validated['customer_reference_code'],
                     'admin_verification_status' => 'pending_review',
+                    'rider_verification_status' => 'pending', // Reset to pending for rider re-verification
+                    'rider_verified_at' => null, // Clear previous verification timestamp
+                    'rider_verification_notes' => null, // Clear previous rejection notes
+                ]);
+                
+                Log::info($isResubmission ? 'Payment proof re-submitted after rejection' : 'Payment proof updated', [
+                    'payment_id' => $payment->id,
+                    'order_id' => $order->id
                 ]);
             } else {
                 // Create new payment record
@@ -295,16 +307,21 @@ class CustomerPaymentController extends Controller
                     'payment_proof_url' => $paymentProofPath,
                     'customer_reference_code' => $validated['customer_reference_code'],
                     'admin_verification_status' => 'pending_review',
+                    'rider_verification_status' => 'pending', // Set to pending for rider verification
                 ]);
+                
+                Log::info('New payment proof submitted', ['payment_id' => $payment->id, 'order_id' => $order->id]);
             }
             
-            Log::info('Payment record created', ['payment_id' => $payment->id, 'status' => $payment->admin_verification_status]);
-            
             // Log order status
+            $statusNote = $isResubmission 
+                ? 'Payment proof re-submitted after rejection, awaiting rider verification' 
+                : 'Payment proof submitted, awaiting rider verification';
+                
             $this->logOrderStatusChange(
                 $order->id, 
                 'pending_payment', 
-                'Payment proof submitted, awaiting rider verification', 
+                $statusNote, 
                 Auth::id()
             );
             
@@ -315,11 +332,15 @@ class CustomerPaymentController extends Controller
             
             // Send notifications
             $this->notifyCustomerPaymentSubmitted($order);
-            $this->notifyRiderPaymentReview($order, $payment); // Changed: Notify rider instead of admin
+            $this->notifyRiderPaymentReview($order, $payment); // Notify rider for verification
             $this->notifyAdminPaymentSubmitted($order, $payment); // Admin gets FYI notification only
             
+            $successMessage = $isResubmission 
+                ? 'Payment proof re-submitted successfully! The rider will verify your new proof shortly.' 
+                : 'Payment proof submitted successfully! Your payment is being verified by the rider.';
+            
             return redirect()->route('customer.orders.show', $order->id)
-                ->with('success', 'Payment proof submitted successfully! Your payment is being verified by the rider.');
+                ->with('success', $successMessage);
             
         } catch (Exception $e) {
             DB::rollBack();
