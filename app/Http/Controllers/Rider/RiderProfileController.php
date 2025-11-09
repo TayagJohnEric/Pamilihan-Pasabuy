@@ -84,7 +84,10 @@ class RiderProfileController extends Controller
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'license_number' => 'nullable|string|max:100',
             'vehicle_type' => 'nullable|string|max:50',
-            'is_available' => 'boolean'
+            'is_available' => 'boolean',
+            'gcash_number' => 'nullable|string|max:20',
+            'gcash_name' => 'nullable|string|max:255',
+            'gcash_qr_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         try {
@@ -97,6 +100,17 @@ class RiderProfileController extends Controller
                 }
                 
                 $profileImageUrl = $request->file('profile_image')->store('profile_images', 'public');
+            }
+
+            // Handle GCash QR code upload
+            $gcashQrPath = $rider->gcash_qr_path;
+            if ($request->hasFile('gcash_qr_path')) {
+                // Delete old QR code if exists
+                if ($gcashQrPath) {
+                    Storage::disk('public')->delete($gcashQrPath);
+                }
+                
+                $gcashQrPath = $request->file('gcash_qr_path')->store('gcash_qr_codes', 'public');
             }
 
             // Update user information
@@ -113,6 +127,9 @@ class RiderProfileController extends Controller
                 'license_number' => $request->license_number,
                 'vehicle_type' => $request->vehicle_type,
                 'is_available' => $request->boolean('is_available'),
+                'gcash_number' => $request->gcash_number,
+                'gcash_name' => $request->gcash_name,
+                'gcash_qr_path' => $gcashQrPath,
             ]);
 
             return redirect()->route('rider.profile.show')

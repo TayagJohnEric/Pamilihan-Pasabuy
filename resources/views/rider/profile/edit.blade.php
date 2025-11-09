@@ -155,6 +155,47 @@
                             <p class="text-xs text-gray-500 mt-1">Check this box if you're currently available to accept delivery orders</p>
                         </div>
 
+                        <!-- GCash Number -->
+                        <div>
+                            <label for="gcash_number" class="block text-sm font-medium text-gray-700 mb-1">GCash Number</label>
+                            <input type="text" name="gcash_number" id="gcash_number" value="{{ old('gcash_number', $rider->gcash_number) }}"
+                                placeholder="09XXXXXXXXX"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200 @error('gcash_number') border-red-500 @enderror">
+                            @error('gcash_number')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- GCash Name -->
+                        <div>
+                            <label for="gcash_name" class="block text-sm font-medium text-gray-700 mb-1">GCash Account Name</label>
+                            <input type="text" name="gcash_name" id="gcash_name" value="{{ old('gcash_name', $rider->gcash_name) }}"
+                                placeholder="Full name as registered in GCash"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200 @error('gcash_name') border-red-500 @enderror">
+                            @error('gcash_name')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- GCash QR Code -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">GCash QR Code</label>
+                            @if($rider->gcash_qr_path)
+                                <div class="mb-3">
+                                    <div class="bg-gray-50 rounded-lg p-3 inline-block">
+                                        <img src="{{ Storage::url($rider->gcash_qr_path) }}" alt="Current GCash QR" class="w-32 h-32 object-contain" id="gcash-qr-preview">
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Current QR code</p>
+                                </div>
+                            @endif
+                            <input type="file" name="gcash_qr_path" id="gcash_qr_path" accept="image/*" 
+                                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
+                            <p class="text-xs text-gray-500 mt-1">Upload your GCash QR code (PNG, JPG, GIF up to 2MB)</p>
+                            @error('gcash_qr_path')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
                         <!-- Read-only Information -->
                         <div class="bg-gray-50 rounded-lg p-4 space-y-3">
                             <h4 class="font-medium text-gray-800">Account Information</h4>
@@ -203,6 +244,7 @@
 
     <!-- Image Preview Script -->
     <script>
+        // Profile image preview
         document.getElementById('profile_image').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -215,6 +257,33 @@
                         currentImage.src = e.target.result;
                     } else if (placeholderImage) {
                         placeholderImage.innerHTML = `<img src="${e.target.result}" alt="Preview" class="h-full w-full object-cover">`;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // GCash QR code preview
+        document.getElementById('gcash_qr_path').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const qrPreview = document.getElementById('gcash-qr-preview');
+                    
+                    if (qrPreview) {
+                        qrPreview.src = e.target.result;
+                    } else {
+                        // Create preview if it doesn't exist
+                        const previewContainer = document.createElement('div');
+                        previewContainer.className = 'mb-3';
+                        previewContainer.innerHTML = `
+                            <div class="bg-gray-50 rounded-lg p-3 inline-block">
+                                <img src="${e.target.result}" alt="QR Preview" class="w-32 h-32 object-contain" id="gcash-qr-preview">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">New QR code preview</p>
+                        `;
+                        document.getElementById('gcash_qr_path').parentElement.insertBefore(previewContainer, document.getElementById('gcash_qr_path'));
                     }
                 };
                 reader.readAsDataURL(file);

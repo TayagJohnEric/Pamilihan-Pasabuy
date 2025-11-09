@@ -128,6 +128,35 @@
                     </div>
                 </div>
 
+                <!-- GCash Payment Information -->
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">GCash Payment Information</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-sm font-medium text-gray-600">GCash Number</label>
+                                <p class="text-gray-900">{{ $rider->gcash_number ?? 'Not provided' }}</p>
+                            </div>
+                            
+                            <div>
+                                <label class="text-sm font-medium text-gray-600">GCash Account Name</label>
+                                <p class="text-gray-900">{{ $rider->gcash_name ?? 'Not provided' }}</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="text-sm font-medium text-gray-600 block mb-2">GCash QR Code</label>
+                            @if($rider->gcash_qr_path)
+                                <div class="bg-gray-50 rounded-lg p-4 inline-block">
+                                    <img src="{{ Storage::url($rider->gcash_qr_path) }}" alt="GCash QR Code" class="w-48 h-48 object-contain">
+                                </div>
+                            @else
+                                <p class="text-gray-500 text-sm">No QR code uploaded</p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Statistics -->
                 <div class="mt-8 pt-6 border-t border-gray-200">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4">Statistics</h3>
