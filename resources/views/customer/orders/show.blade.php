@@ -83,10 +83,32 @@
 
                 <!-- Action Buttons -->
                 <div class="flex flex-wrap gap-3 mt-4">
+                    @if($order->status === 'assigned' && $order->payment_method === 'online_payment' && $order->payment_status === 'pending')
+                        <!-- Payment Required Button -->
+                        <div class="w-full p-4 bg-yellow-50 border border-yellow-200 rounded-xl mb-4">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                                <div class="flex-1">
+                                    <h3 class="text-sm font-semibold text-yellow-800 mb-1">Payment Required</h3>
+                                    <p class="text-sm text-yellow-700 mb-3">A rider has accepted your order! Please complete your payment to proceed with delivery.</p>
+                                    <a href="{{ route('payment.gcash-instructions', $order->id) }}"
+                                       class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-medium text-sm shadow-sm">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                        </svg>
+                                        Complete Payment Now
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                    
                     @if($order->status === 'pending_payment')
                          <h2 class="px-6 py-2.5 text-xl font-bold text-gray-900">Payment submitted, awaiting verification.</h2>
-
                     @endif
+                    
                     @if($order->status === 'delivered')
                         @php
                             $hasRated = isset($order->ratings)

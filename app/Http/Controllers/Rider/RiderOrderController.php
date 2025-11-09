@@ -142,15 +142,25 @@ class RiderOrderController extends Controller
             );
 
             // Notify customer that rider accepted the assignment
+            $notificationMessage = 'Your order has been assigned to a rider and will be picked up soon.';
+            $notificationType = 'rider_assigned';
+            
+            // If online payment and not yet paid, notify customer to complete payment
+            if ($order->payment_method === 'online_payment' && $order->payment_status === 'pending') {
+                $notificationMessage = 'A rider has accepted your order! Please complete your payment to proceed with delivery.';
+                $notificationType = 'payment_required';
+            }
+            
             $this->createNotification(
                 $order->customer_user_id,
-                'rider_assigned',
+                $notificationType,
                 'Rider Assigned to Your Order',
                 [
                     'order_id' => $order->id,
                     'rider_name' => Auth::user()->first_name . ' ' . Auth::user()->last_name,
                     'rider_phone' => Auth::user()->phone_number,
-                    'message' => 'Your order has been assigned to a rider and will be picked up soon.'
+                    'message' => $notificationMessage,
+                    'requires_payment' => ($order->payment_method === 'online_payment' && $order->payment_status === 'pending')
                 ],
                 Order::class,
                 $order->id

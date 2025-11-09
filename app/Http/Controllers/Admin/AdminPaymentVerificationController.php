@@ -29,7 +29,7 @@ class AdminPaymentVerificationController extends Controller
 
         $query = Payment::with([
                 'order.customer',
-                'order.rider.user',
+                'order.rider',
                 'order.deliveryAddress'
             ])
             ->where('payment_method_used', 'online_payment');
@@ -86,7 +86,7 @@ class AdminPaymentVerificationController extends Controller
         // Load relationships
         $payment->load([
             'order.customer',
-            'order.rider.user',
+            'order.rider',
             'order.deliveryAddress.district',
             'order.orderItems.product.vendor',
             'verifiedBy'

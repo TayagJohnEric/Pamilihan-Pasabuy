@@ -173,6 +173,11 @@
                               class="space-y-6">
                             @csrf
                             
+                            <!-- Hidden field for order ID if this is post-rider-acceptance payment -->
+                            @if(isset($orderSummary['order_id']))
+                                <input type="hidden" name="order_id" value="{{ $orderSummary['order_id'] }}">
+                            @endif
+                            
                             <!-- File Upload -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">

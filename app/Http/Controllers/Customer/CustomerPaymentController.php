@@ -20,7 +20,8 @@ use Exception;
 class CustomerPaymentController extends Controller
 {
     /**
-     * Display the payment confirmation page for online payments
+     * Display the order confirmation page for online payments
+     * Order will be created without payment - payment happens after rider acceptance
      */
     public function paymentConfirmation(Request $request)
     {
@@ -64,31 +65,65 @@ class CustomerPaymentController extends Controller
     
     /**
      * Display GCash payment instructions and upload page
+     * This is now shown AFTER rider has accepted the order
      */
-    public function showGCashInstructions(Request $request)
+    public function showGCashInstructions(Request $request, $orderId = null)
     {
-        $orderSummary = session('order_summary');
-        
-        if (!$orderSummary || $orderSummary['payment_method'] !== 'online_payment') {
-            return redirect()->route('checkout.index')
-                ->with('error', 'Invalid payment session. Please try again.');
-        }
-        
-        // Validate cart items are still available
         $user = Auth::user();
-        $cartItems = ShoppingCartItem::with(['product.vendor', 'product'])
-            ->where('user_id', $user->id)
-            ->get();
         
-        if ($cartItems->isEmpty() || $cartItems->count() !== $orderSummary['item_count']) {
-            return redirect()->route('cart.index')
-                ->with('error', 'Your cart has changed. Please review and try again.');
+        // If order ID is provided, fetch order details (payment after rider acceptance)
+        if ($orderId) {
+            $order = Order::with(['rider', 'customer', 'deliveryAddress.district', 'orderItems'])
+                ->where('id', $orderId)
+                ->where('customer_user_id', $user->id)
+                ->first();
+            
+            if (!$order) {
+                return redirect()->route('customer.orders.index')
+                    ->with('error', 'Order not found.');
+            }
+            
+            // Verify order is in correct state for payment
+            if ($order->payment_method !== 'online_payment') {
+                return redirect()->route('customer.orders.show', $order->id)
+                    ->with('error', 'This order does not require online payment.');
+            }
+            
+            if ($order->payment_status !== 'pending') {
+                return redirect()->route('customer.orders.show', $order->id)
+                    ->with('info', 'Payment has already been submitted or processed.');
+            }
+            
+            if ($order->status !== 'assigned') {
+                return redirect()->route('customer.orders.show', $order->id)
+                    ->with('error', 'Payment can only be made after rider accepts the order.');
+            }
+            
+            // Build order summary from existing order
+            $orderSummary = [
+                'order_id' => $order->id,
+                'total_amount' => $order->final_total_amount,
+                'subtotal' => $order->subtotal_amount,
+                'delivery_fee' => $order->delivery_fee,
+                'item_count' => $order->orderItems->count(),
+                'selected_rider' => $order->rider, 
+                'rider_selection_type' => $order->rider_user_id ? 'assigned' : 'system_assign',
+                'payment_method' => 'online_payment',
+            ];
+        } else {
+            // Legacy flow: from checkout session (keeping for backward compatibility)
+            $orderSummary = session('order_summary');
+            
+            if (!$orderSummary || $orderSummary['payment_method'] !== 'online_payment') {
+                return redirect()->route('checkout.index')
+                    ->with('error', 'Invalid payment session. Please try again.');
+            }
         }
         
-        // Get rider's GCash details
+        // Get rider's GCash details from the assigned rider
         $riderGCashDetails = null;
         
-        if ($orderSummary['rider_selection_type'] === 'choose_rider' && $orderSummary['selected_rider']) {
+        if ($orderSummary['selected_rider']) {
             $rider = Rider::where('user_id', $orderSummary['selected_rider']->id)
                 ->with('user')
                 ->first();
@@ -136,30 +171,54 @@ class CustomerPaymentController extends Controller
     
     /**
      * Process GCash payment proof submission
+     * Can handle both new orders (from checkout) and existing orders (after rider acceptance)
      */
     public function submitGCashProof(Request $request)
     {
         Log::info('GCash payment proof submission started', [
             'user_id' => Auth::id(),
             'has_file' => $request->hasFile('payment_proof'),
+            'has_order_id' => $request->has('order_id'),
             'request_all' => $request->except('payment_proof')
         ]);
         
-        $orderSummary = session('order_summary');
+        $user = Auth::user();
+        $orderId = $request->input('order_id');
         
-        Log::info('Order summary from session', [
-            'has_summary' => !is_null($orderSummary),
-            'payment_method' => $orderSummary['payment_method'] ?? 'N/A',
-            'summary_keys' => $orderSummary ? array_keys($orderSummary) : []
-        ]);
-        
-        if (!$orderSummary || $orderSummary['payment_method'] !== 'online_payment') {
-            Log::warning('Invalid payment session detected', [
+        // Check if this is for an existing order (after rider acceptance)
+        if ($orderId) {
+            $order = Order::where('id', $orderId)
+                ->where('customer_user_id', $user->id)
+                ->first();
+            
+            if (!$order) {
+                return redirect()->route('customer.orders.index')
+                    ->with('error', 'Order not found.');
+            }
+            
+            // Verify order state
+            if ($order->payment_method !== 'online_payment' || $order->payment_status !== 'pending') {
+                return redirect()->route('customer.orders.show', $order->id)
+                    ->with('error', 'This order cannot accept payment at this time.');
+            }
+        } else {
+            // Legacy flow: from checkout session
+            $orderSummary = session('order_summary');
+            
+            Log::info('Order summary from session', [
                 'has_summary' => !is_null($orderSummary),
-                'payment_method' => $orderSummary['payment_method'] ?? 'N/A'
+                'payment_method' => $orderSummary['payment_method'] ?? 'N/A',
+                'summary_keys' => $orderSummary ? array_keys($orderSummary) : []
             ]);
-            return redirect()->route('checkout.index')
-                ->with('error', 'Invalid payment session. Please try again.');
+            
+            if (!$orderSummary || $orderSummary['payment_method'] !== 'online_payment') {
+                Log::warning('Invalid payment session detected', [
+                    'has_summary' => !is_null($orderSummary),
+                    'payment_method' => $orderSummary['payment_method'] ?? 'N/A'
+                ]);
+                return redirect()->route('checkout.index')
+                    ->with('error', 'Invalid payment session. Please try again.');
+            }
         }
         
         // Validate request
@@ -187,19 +246,24 @@ class CustomerPaymentController extends Controller
         DB::beginTransaction();
         
         try {
-            // Create order with pending_payment status
-            $order = $this->createOrderFromSession(
-                $orderSummary, 
-                'online_payment', 
-                $request->input('special_instructions')
-            );
-            
-            Log::info('Order created successfully', ['order_id' => $order->id]);
-            
-            // Create order items
-            $this->createOrderItems($order, $orderSummary['cart_items']);
-            
-            Log::info('Order items created', ['order_id' => $order->id, 'item_count' => $orderSummary['cart_items']->count()]);
+            // If no existing order, create one (legacy flow)
+            if (!isset($order)) {
+                $orderSummary = session('order_summary');
+                
+                // Create order with pending_payment status
+                $order = $this->createOrderFromSession(
+                    $orderSummary, 
+                    'online_payment', 
+                    $request->input('special_instructions')
+                );
+                
+                Log::info('Order created successfully', ['order_id' => $order->id]);
+                
+                // Create order items
+                $this->createOrderItems($order, $orderSummary['cart_items']);
+                
+                Log::info('Order items created', ['order_id' => $order->id, 'item_count' => $orderSummary['cart_items']->count()]);
+            }
             
             // Upload payment proof
             $paymentProofPath = null;
@@ -211,16 +275,28 @@ class CustomerPaymentController extends Controller
                 Log::info('Payment proof uploaded', ['path' => $paymentProofPath]);
             }
             
-            // Create payment record with proof
-            $payment = Payment::create([
-                'order_id' => $order->id,
-                'amount_paid' => $orderSummary['total_amount'],
-                'payment_method_used' => 'online_payment',
-                'status' => 'pending',
-                'payment_proof_url' => $paymentProofPath,
-                'customer_reference_code' => $validated['customer_reference_code'],
-                'admin_verification_status' => 'pending_review',
-            ]);
+            // Create or update payment record with proof
+            $payment = Payment::where('order_id', $order->id)->first();
+            
+            if ($payment) {
+                // Update existing payment record
+                $payment->update([
+                    'payment_proof_url' => $paymentProofPath,
+                    'customer_reference_code' => $validated['customer_reference_code'],
+                    'admin_verification_status' => 'pending_review',
+                ]);
+            } else {
+                // Create new payment record
+                $payment = Payment::create([
+                    'order_id' => $order->id,
+                    'amount_paid' => $order->final_total_amount,
+                    'payment_method_used' => 'online_payment',
+                    'status' => 'pending',
+                    'payment_proof_url' => $paymentProofPath,
+                    'customer_reference_code' => $validated['customer_reference_code'],
+                    'admin_verification_status' => 'pending_review',
+                ]);
+            }
             
             Log::info('Payment record created', ['payment_id' => $payment->id, 'status' => $payment->admin_verification_status]);
             
@@ -228,7 +304,7 @@ class CustomerPaymentController extends Controller
             $this->logOrderStatusChange(
                 $order->id, 
                 'pending_payment', 
-                'Payment proof submitted, awaiting admin verification', 
+                'Payment proof submitted, awaiting rider verification', 
                 Auth::id()
             );
             
@@ -239,10 +315,11 @@ class CustomerPaymentController extends Controller
             
             // Send notifications
             $this->notifyCustomerPaymentSubmitted($order);
-            $this->notifyAdminPaymentReview($order, $payment);
+            $this->notifyRiderPaymentReview($order, $payment); // Changed: Notify rider instead of admin
+            $this->notifyAdminPaymentSubmitted($order, $payment); // Admin gets FYI notification only
             
             return redirect()->route('customer.orders.show', $order->id)
-                ->with('success', 'Payment proof submitted successfully! Your payment is being verified by our admin team.');
+                ->with('success', 'Payment proof submitted successfully! Your payment is being verified by the rider.');
             
         } catch (Exception $e) {
             DB::rollBack();
@@ -255,6 +332,54 @@ class CustomerPaymentController extends Controller
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Failed to submit payment proof. Please try again.');
+        }
+    }
+    
+    /**
+     * Confirm and place order for online payment without immediate payment
+     * Payment will be collected after rider accepts
+     */
+    public function confirmOnlinePaymentOrder(Request $request)
+    {
+        $orderSummary = session('order_summary');
+        
+        if (!$orderSummary || $orderSummary['payment_method'] !== 'online_payment') {
+            return redirect()->route('checkout.index')
+                ->with('error', 'Invalid order session. Please try again.');
+        }
+        
+        DB::beginTransaction();
+        
+        try {
+            // Create order with processing status (no payment yet)
+            $order = $this->createOrderFromSession($orderSummary, 'online_payment', $request->input('special_instructions'));
+            
+            // Create order items
+            $this->createOrderItems($order, $orderSummary['cart_items']);
+            
+            // Create payment record placeholder
+            $this->createPaymentRecord($order, $orderSummary['total_amount'], 'online_payment');
+            
+            DB::commit();
+            
+            // Trigger order finalization (handles stock, cart clearing, notifications)
+            $fulfillmentController = new CustomerOrderFulfillmentController();
+            $fulfillmentController->finalizeOrder($order);
+            
+            session()->forget('order_summary');
+            
+            return redirect()->route('customer.orders.show', $order->id)
+                ->with('success', 'Order placed successfully! You will be notified when a rider accepts your order. Payment will be required after rider confirmation.');
+            
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Online payment order creation failed: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'exception' => $e
+            ]);
+            
+            return redirect()->back()
+                ->with('error', 'Order placement failed. Please try again.');
         }
     }
     
@@ -459,9 +584,37 @@ class CustomerPaymentController extends Controller
     }
     
     /**
-     * Notify admin of new payment to review
+     * Notify rider to verify payment (PRIMARY NOTIFICATION)
      */
-    private function notifyAdminPaymentReview(Order $order, Payment $payment)
+    private function notifyRiderPaymentReview(Order $order, Payment $payment)
+    {
+        if (!$order->rider_user_id) {
+            Log::warning('Cannot notify rider - no rider assigned to order', ['order_id' => $order->id]);
+            return;
+        }
+        
+        $fulfillmentController = new CustomerOrderFulfillmentController();
+        
+        $fulfillmentController->createNotification(
+            $order->rider_user_id,
+            'payment_verification_required',
+            'Payment Proof Submitted - Please Verify',
+            [
+                'order_id' => $order->id,
+                'payment_id' => $payment->id,
+                'customer_name' => $order->customer->name,
+                'amount' => '₱' . number_format($order->final_total_amount, 2),
+                'message' => 'Customer has submitted payment proof. Please check your GCash and verify receipt.'
+            ],
+            Payment::class,
+            $payment->id
+        );
+    }
+    
+    /**
+     * Notify admin of payment submission (FYI ONLY - for oversight)
+     */
+    private function notifyAdminPaymentSubmitted(Order $order, Payment $payment)
     {
         // Get all admin users
         $adminUsers = User::where('role', 'admin')->where('is_active', true)->get();
@@ -471,14 +624,15 @@ class CustomerPaymentController extends Controller
         foreach ($adminUsers as $admin) {
             $fulfillmentController->createNotification(
                 $admin->id,
-                'payment_review_required',
-                'New Payment Proof to Review',
+                'payment_submitted_info',
+                'Payment Proof Submitted (Rider Verification)',
                 [
                     'order_id' => $order->id,
                     'payment_id' => $payment->id,
                     'customer_name' => $order->customer->name,
+                    'rider_name' => $order->rider->name ?? 'N/A',
                     'amount' => '₱' . number_format($order->final_total_amount, 2),
-                    'message' => 'A new payment proof has been submitted and requires verification.'
+                    'message' => 'Payment proof submitted. Rider will verify. (FYI only - no action needed unless disputed)'
                 ],
                 Payment::class,
                 $payment->id

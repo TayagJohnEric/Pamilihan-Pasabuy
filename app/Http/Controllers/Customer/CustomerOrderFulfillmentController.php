@@ -189,7 +189,7 @@ class CustomerOrderFulfillmentController extends Controller
     public function getOrderStatusUpdate($orderId)
     {
         $order = Order::with([
-            'rider.user',
+            'rider',
             'orderItems',
             'statusHistory' => function($query) {
                 $query->latest()->limit(5);

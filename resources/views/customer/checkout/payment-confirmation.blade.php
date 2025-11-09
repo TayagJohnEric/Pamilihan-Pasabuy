@@ -184,13 +184,13 @@
                     </div>
                     
                     <!-- Payment Process Notice -->
-                    <div class="mt-4 flex items-start gap-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <svg class="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <div class="mt-4 flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <svg class="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                         </svg>
                         <div>
-                            <p class="text-sm font-medium text-yellow-800">Payment Instructions</p>
-                            <p class="text-sm text-yellow-700">You will receive GCash payment details on the next page. After sending payment, upload your proof for verification.</p>
+                            <p class="text-sm font-medium text-blue-800">Payment Process (NEW)</p>
+                            <p class="text-sm text-blue-700">Your order will be placed first. Payment will be required AFTER a rider accepts your order. You'll receive a notification with the rider's GCash details.</p>
                         </div>
                     </div>
                 </div>
@@ -238,15 +238,16 @@
                         </div>
                         
                         <!-- Action Form -->
-                        <form id="payment-form" method="GET" action="{{ route('payment.gcash-instructions') }}" class="space-y-3">
-                            <!-- Proceed to Payment Button -->
+                        <form id="payment-form" method="POST" action="{{ route('payment.confirm-online-order') }}" class="space-y-3">
+                            @csrf
+                            <!-- Confirm Order Button -->
                             <button type="submit" 
                                     id="payment-submit-btn"
                                     class="w-full bg-gradient-to-r from-blue-600 via-blue-600 to-indigo-600 text-white px-6 py-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 inline-flex items-center justify-center">
                                 <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                <span id="payment-btn-text">Proceed to Payment</span>
+                                <span id="payment-btn-text">Confirm Order</span>
                             </button>
                             
                             <!-- Back to Checkout -->
@@ -381,9 +382,9 @@ $(document).ready(function() {
         
         // Show loading state
         submitBtn.prop('disabled', true).addClass('opacity-75 cursor-not-allowed');
-        btnText.text('Loading Payment Details...');
+        btnText.text('Placing Order...');
         
-        // Form will submit normally (GET request)
+        // Form will submit normally (POST request)
         return true;
     });
 });

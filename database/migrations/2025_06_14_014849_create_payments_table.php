@@ -21,10 +21,19 @@ return new class extends Migration
             // ✅ ADDED: New fields for manual verification
             $table->string('payment_proof_url')->nullable();
             $table->string('customer_reference_code')->nullable();
+            
+            // Admin verification (for oversight/disputes only)
             $table->enum('admin_verification_status', ['pending_review', 'approved', 'rejected'])
                   ->default('pending_review');
             $table->text('admin_notes')->nullable();
             $table->foreignId('verified_by_user_id')->nullable()->constrained('users')->nullOnDelete();
+            
+            // ⭐ NEW: Rider verification (primary verification)
+            $table->enum('rider_verification_status', ['pending', 'verified', 'rejected'])
+                  ->default('pending');
+            $table->timestamp('rider_verified_at')->nullable();
+            $table->text('rider_verification_notes')->nullable();
+            $table->foreignId('verified_by_rider_id')->nullable()->constrained('users')->nullOnDelete();
 
             // ❌ REMOVED: PayMongo fields
             // $table->string('gateway_transaction_id')->nullable();
@@ -37,8 +46,9 @@ return new class extends Migration
             $table->text('refund_details')->nullable();
             $table->timestamps();
 
-            // Index for admin dashboard
+            // Indexes for verification dashboards
             $table->index('admin_verification_status');
+            $table->index('rider_verification_status');
         });
 
         // Add check constraint for payments

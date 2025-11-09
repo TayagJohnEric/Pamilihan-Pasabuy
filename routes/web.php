@@ -134,11 +134,16 @@ Route::middleware(['auth'])->group(function () {
     // Payment processing routes
     Route::post('/payment/process-cod', [CustomerPaymentController::class, 'processCOD'])
         ->name('payment.process-cod');
+    
+    // Confirm online payment order (without immediate payment)
+    Route::post('/payment/confirm-online-order', [CustomerPaymentController::class, 'confirmOnlinePaymentOrder'])
+        ->name('payment.confirm-online-order');
 });
 
 // Manual GCash Payment Routes
 Route::middleware(['auth'])->group(function () {
-    Route::get('/payment/gcash-instructions', [CustomerPaymentController::class, 'showGCashInstructions'])
+    // GCash instructions - can be accessed during checkout or after rider acceptance
+    Route::get('/payment/gcash-instructions/{orderId?}', [CustomerPaymentController::class, 'showGCashInstructions'])
         ->name('payment.gcash-instructions');
     
     Route::post('/payment/gcash-submit-proof', [CustomerPaymentController::class, 'submitGCashProof'])
@@ -392,6 +397,25 @@ Route::middleware(['auth', 'role:rider'])->prefix('rider')->name('rider.')->grou
     // Rider availability toggle (AJAX + regular)
     Route::patch('/availability/toggle', [App\Http\Controllers\Rider\RiderOrderController::class, 'toggleAvailability'])
         ->name('availability.toggle');
+    
+    // Payment Verification routes
+    Route::prefix('payments')->name('payments.')->group(function () {
+        // Display list of payments pending verification
+        Route::get('/', [App\Http\Controllers\Rider\RiderPaymentController::class, 'index'])
+            ->name('index');
+        
+        // Show specific payment for verification
+        Route::get('/{payment}', [App\Http\Controllers\Rider\RiderPaymentController::class, 'show'])
+            ->name('show');
+        
+        // Verify payment as received
+        Route::post('/{payment}/verify', [App\Http\Controllers\Rider\RiderPaymentController::class, 'verify'])
+            ->name('verify');
+        
+        // Reject payment verification
+        Route::post('/{payment}/reject', [App\Http\Controllers\Rider\RiderPaymentController::class, 'reject'])
+            ->name('reject');
+    });
 });
 
 
