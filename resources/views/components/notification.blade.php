@@ -60,6 +60,10 @@
                                 @case('new_order')
                                     <div class="w-2 h-2 {{ $notification->read_at ? 'bg-gray-400' : 'bg-purple-500' }} rounded-full"></div>
                                     @break
+                                @case('new_payment_review')
+                                @case('payment_pending_review')
+                                    <div class="w-2 h-2 {{ $notification->read_at ? 'bg-gray-400' : 'bg-orange-500' }} rounded-full"></div>
+                                    @break
                                 @case('delivery_assigned')
                                     <div class="w-2 h-2 {{ $notification->read_at ? 'bg-gray-400' : 'bg-indigo-500' }} rounded-full"></div>
                                     @break
@@ -101,6 +105,13 @@
                                             @break
                                         @case('rider_assignment_delayed')
                                             Rider assignment delayed for Order #{{ $notification->message['order_id'] ?? '' }}
+                                            @break
+                                        @case('new_payment_review')
+                                        @case('payment_pending_review')
+                                            New payment to review for Order #{{ $notification->message['order_id'] ?? '' }}
+                                            @if(isset($notification->message['amount']))
+                                                <span class="text-xs text-gray-500 block">Amount: ₱{{ number_format($notification->message['amount'], 2) }}</span>
+                                            @endif
                                             @break
                                         @case('rider_payout_paid')
                                             Payout of ₱{{ number_format($notification->message['amount'] ?? 0, 2) }} has been processed
@@ -144,6 +155,13 @@
                             class="text-green-600 hover:text-green-700 text-sm font-medium ml-2 flex-shrink-0">
                             View
                         </a>
+                    @elseif(in_array($notification->type, ['new_payment_review', 'payment_pending_review']))
+                        @if(auth()->user()->role === 'admin')
+                            <a href="{{ route('admin.payments.pending') }}"
+                                class="text-orange-600 hover:text-orange-700 text-sm font-medium ml-2 flex-shrink-0">
+                                View
+                            </a>
+                        @endif
                     @elseif(in_array($notification->type, ['rider_payout_paid', 'rider_payout_failed']) && isset($notification->message['payout_id']))
                         @if(auth()->user()->role === 'admin')
                             <a href="{{ route('admin.payouts.riders.show', ['id' => $notification->message['payout_id']]) }}"
@@ -264,7 +282,7 @@
                     })
                     .then(() => {
                         dot.classList.remove('animate-pulse');
-                        dot.classList.remove('bg-blue-500', 'bg-green-500', 'bg-red-500', 'bg-yellow-500', 'bg-purple-500', 'bg-indigo-500');
+                        dot.classList.remove('bg-blue-500', 'bg-green-500', 'bg-red-500', 'bg-yellow-500', 'bg-purple-500', 'bg-indigo-500', 'bg-orange-500');
                         dot.classList.add('bg-gray-400');
                         // Refresh the count to ensure accuracy
                         refreshNotificationCount();
@@ -299,7 +317,7 @@
             .then(() => {
                 // Mark all notification dots as read
                 document.querySelectorAll('.notification-item div.w-2').forEach(dot => {
-                    dot.classList.remove('bg-blue-500', 'bg-green-500', 'bg-red-500', 'bg-yellow-500', 'bg-purple-500', 'bg-indigo-500');
+                    dot.classList.remove('bg-blue-500', 'bg-green-500', 'bg-red-500', 'bg-yellow-500', 'bg-purple-500', 'bg-indigo-500', 'bg-orange-500');
                     dot.classList.add('bg-gray-400');
                 });
                 countBadge.classList.add('hidden');

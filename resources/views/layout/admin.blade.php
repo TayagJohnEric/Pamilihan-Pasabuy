@@ -95,11 +95,6 @@
             // Header dropdown elements
             const profileMenuButton = document.getElementById('profile-menu-button');
             const profileDropdown = document.getElementById('profile-dropdown');
-            const notificationButton = document.getElementById('notification-button');
-            const notificationDropdown = document.getElementById('notification-dropdown');
-                        const closeNotificationDropdown = document.getElementById('close-notification-dropdown');
-
-            const cartButton = document.getElementById('cart-button');
 
             // Sidebar functionality
             function openSidebar() {
@@ -156,52 +151,29 @@
                 }
             });
 
-            // Header dropdown functionality
+            // Header dropdown functionality - ONLY for profile menu
             if (profileMenuButton && profileDropdown) {
                 profileMenuButton.addEventListener('click', function(event) {
                     event.stopPropagation();
                     profileDropdown.classList.toggle('hidden');
-                    // Close notification dropdown if open
-                    if (notificationDropdown) notificationDropdown.classList.add('hidden');
+                    
+                    // Close notification dropdown if open (let the notification component handle its own state)
+                    const notificationDropdown = document.getElementById('notification-dropdown');
+                    if (notificationDropdown && !notificationDropdown.classList.contains('hidden')) {
+                        notificationDropdown.classList.add('hidden', 'scale-95', 'opacity-0');
+                        notificationDropdown.classList.remove('scale-100', 'opacity-100');
+                    }
                 });
             }
 
-            if (notificationButton && notificationDropdown) {
-                notificationButton.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                    notificationDropdown.classList.toggle('hidden');
-                    // Close profile dropdown if open
-                    if (profileDropdown) profileDropdown.classList.add('hidden');
-                });
-            }
-
-            if (cartButton) {
-                cartButton.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    // Add cart functionality here
-                    alert('Cart clicked! Add your cart logic here.');
-                });
-            }
-
-            // Close dropdowns when clicking outside
+            // Close profile dropdown when clicking outside
             document.addEventListener('click', function(event) {
                 if (profileMenuButton && profileDropdown && 
                     !profileMenuButton.contains(event.target) && 
                     !profileDropdown.contains(event.target)) {
                     profileDropdown.classList.add('hidden');
                 }
-                
-                if (notificationButton && notificationDropdown && 
-                    !notificationButton.contains(event.target) && 
-                    !notificationDropdown.contains(event.target)) {
-                    notificationDropdown.classList.add('hidden');
-                }
-            });
-
- //Notification Close Button in mobile size
-            closeNotificationDropdown?.addEventListener('click', function () {
-            notificationDropdown?.classList.add('hidden');
-        }); 
+            }); 
             
             // Dropdown toggle functionality for navigation items
             const dropdownToggles = document.querySelectorAll('.dropdown-toggle');

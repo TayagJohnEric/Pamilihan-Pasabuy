@@ -84,9 +84,8 @@
                 <!-- Action Buttons -->
                 <div class="flex flex-wrap gap-3 mt-4">
                     @if($order->status === 'pending_payment')
-                        <button class="px-6 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors font-medium text-sm shadow-sm">
-                            Pay Now
-                        </button>
+                         <h2 class="px-6 py-2.5 text-xl font-bold text-gray-900">Payment submitted, awaiting verification.</h2>
+
                     @endif
                     @if($order->status === 'delivered')
                         @php

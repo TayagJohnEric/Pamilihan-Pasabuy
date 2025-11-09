@@ -185,15 +185,6 @@
     
     <!-- Status Badge Overlay -->
     <div class="absolute top-2 sm:top-3 right-2 sm:right-3 flex flex-col gap-1 sm:gap-2">
-        @if($vendor->verification_status === 'verified')
-            <span class="inline-flex items-center text-green-800 bg-green-100 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-xs font-medium shadow-sm flex-shrink-0"
-                  title="Verified vendor">
-                <svg class="w-1.5 h-1.5 rounded-full mr-1 sm:mr-1.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                </svg>
-                Verified
-            </span>
-        @endif
 
         <span class="inline-flex items-center px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-xs font-medium shadow-sm
                     {{ $vendor->is_accepting_orders 

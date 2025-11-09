@@ -193,7 +193,7 @@
                                         </a>
                                         @if($order->status === 'pending_payment')
                                             <button class="flex-1 sm:flex-none px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
-                                                Pay Now
+                                                Waiting for Verification
                                             </button>
                                         @endif
                                     </div>
