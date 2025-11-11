@@ -82,10 +82,10 @@
         </div>
     </div>
 
-    <!-- Daily Earnings Chart & Pending Payout -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <!-- Daily Earnings Chart -->
+    <div class="mb-6">
         <!-- Daily Earnings (Last 7 Days) -->
-        <div class="lg:col-span-2 bg-white rounded-lg shadow p-6">
+        <div class="bg-white rounded-lg shadow p-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Daily Earnings (Last 7 Days)</h3>
             <div class="h-64">
                 <div class="flex items-end justify-between h-full space-x-2">
@@ -103,108 +103,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Pending Payout -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Pending Payout</h3>
-            @if($pendingPayout)
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <div class="flex items-center mb-3">
-                        <svg class="w-5 h-5 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="text-sm font-medium text-yellow-800">{{ ucfirst($pendingPayout->status) }}</span>
-                    </div>
-                    <p class="text-2xl font-bold text-gray-800 mb-2">₱{{ number_format($pendingPayout->total_payout_amount, 2) }}</p>
-                    <p class="text-sm text-gray-600">
-                        Period: {{ $pendingPayout->payout_period_start_date->format('M j') }} - 
-                        {{ $pendingPayout->payout_period_end_date->format('M j, Y') }}
-                    </p>
-                    @if($pendingPayout->total_incentives_earned > 0)
-                        <p class="text-xs text-green-600 mt-1">
-                            +₱{{ number_format($pendingPayout->total_incentives_earned, 2) }} incentives
-                        </p>
-                    @endif
-                </div>
-            @else
-                <div class="text-center py-8">
-                    <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"/>
-                    </svg>
-                    <p class="text-gray-500 text-sm">No pending payouts</p>
-                </div>
-            @endif
-        </div>
-    </div>
-
-    <!-- Recent Payouts -->
-    <div class="bg-white rounded-lg shadow p-6">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-gray-800">Recent Payouts</h3>
-            <a href="{{ route('rider.payouts') }}" 
-               class="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                View All →
-            </a>
-        </div>
-        
-        @if($recentPayouts->count() > 0)
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="border-b">
-                            <th class="text-left py-3 text-sm font-medium text-gray-600">Period</th>
-                            <th class="text-left py-3 text-sm font-medium text-gray-600">Amount</th>
-                            <th class="text-left py-3 text-sm font-medium text-gray-600">Status</th>
-                            <th class="text-left py-3 text-sm font-medium text-gray-600">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($recentPayouts as $payout)
-                        <tr class="border-b border-gray-100 hover:bg-gray-50">
-                            <td class="py-3">
-                                <p class="text-sm text-gray-800">
-                                    {{ $payout->payout_period_start_date->format('M j') }} - 
-                                    {{ $payout->payout_period_end_date->format('M j') }}
-                                </p>
-                            </td>
-                            <td class="py-3">
-                                <p class="text-sm font-medium text-gray-800">
-                                    ₱{{ number_format($payout->total_payout_amount, 2) }}
-                                </p>
-                                @if($payout->total_incentives_earned > 0)
-                                    <p class="text-xs text-green-600">
-                                        +₱{{ number_format($payout->total_incentives_earned, 2) }} incentives
-                                    </p>
-                                @endif
-                            </td>
-                            <td class="py-3">
-                                <span class="px-2 py-1 text-xs rounded-full 
-                                    {{ $payout->status === 'paid' ? 'bg-green-100 text-green-800' : '' }}
-                                    {{ $payout->status === 'pending_payment' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                    {{ $payout->status === 'pending_calculation' ? 'bg-blue-100 text-blue-800' : '' }}
-                                    {{ $payout->status === 'failed' ? 'bg-red-100 text-red-800' : '' }}">
-                                    {{ ucfirst(str_replace('_', ' ', $payout->status)) }}
-                                </span>
-                            </td>
-                            <td class="py-3">
-                                <p class="text-sm text-gray-600">
-                                    {{ $payout->created_at->format('M j, Y') }}
-                                </p>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @else
-            <div class="text-center py-8">
-                <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
-                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 102 0V3h4v1a1 1 0 102 0V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm2.707 4.707a1 1 0 00-1.414-1.414L4 9.586l-.293-.293a1 1 0 10-1.414 1.414l1 1a1 1 0 001.414 0l2-2z" clip-rule="evenodd"/>
-                </svg>
-                <p class="text-gray-500">No payout history available</p>
-            </div>
-        @endif
     </div>
 </div>
 @endsection

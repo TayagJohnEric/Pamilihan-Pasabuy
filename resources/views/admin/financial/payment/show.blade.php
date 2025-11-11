@@ -1,6 +1,6 @@
 @extends('layout.admin')
 
-@section('title', 'Review Payment - Admin')
+@section('title', 'Payment Details - Admin')
 
 @section('content')
 <!-- Toast Notification Container -->
@@ -24,7 +24,7 @@
         <div class="mb-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Payment Review</h1>
+                    <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Payment Details</h1>
                     <p class="text-sm lg:text-base text-gray-600 mt-1">
                         Order #{{ $payment->order_id }} - {{ $payment->order->customer->name }}
                     </p>
@@ -138,7 +138,7 @@
                         
                         @if($payment->verifiedBy)
                             <div class="pt-4 border-t border-gray-200">
-                                <p class="text-sm text-gray-600 mb-1">Verified By</p>
+                                <p class="text-sm text-gray-600 mb-1">Verified By (Rider)</p>
                                 <p class="text-base font-medium text-gray-900">{{ $payment->verifiedBy->name }}</p>
                                 @if($payment->payment_processed_at)
                                     <p class="text-sm text-gray-500">{{ $payment->payment_processed_at->format('M d, Y h:i A') }}</p>
@@ -148,7 +148,7 @@
                         
                         @if($payment->admin_notes)
                             <div class="pt-4 border-t border-gray-200">
-                                <p class="text-sm text-gray-600 mb-1">Admin Notes</p>
+                                <p class="text-sm text-gray-600 mb-1">Verification Notes</p>
                                 <p class="text-base text-gray-900">{{ $payment->admin_notes }}</p>
                             </div>
                         @endif
@@ -293,51 +293,21 @@
                         </div>
                     @endif
                     
-                    <!-- Action Buttons -->
-                    @if($payment->admin_verification_status === 'pending_review')
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                            <h2 class="text-lg font-semibold text-gray-900 mb-4">Verification Actions</h2>
-                            
-                            <!-- Approve Form -->
-                            <form id="approve-form" method="POST" action="{{ route('admin.payments.approve', $payment->id) }}" class="mb-3">
-                                @csrf
-                                <div class="mb-3">
-                                    <label for="approve_notes" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Approval Notes (Optional)
-                                    </label>
-                                    <textarea id="approve_notes" 
-                                              name="admin_notes" 
-                                              rows="2"
-                                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none text-sm"
-                                              placeholder="Add any notes about this approval..."></textarea>
-                                </div>
-                                <button type="submit" 
-                                        class="w-full bg-green-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center justify-center">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    Approve Payment
-                                </button>
-                            </form>
-                            
-                            <!-- Reject Button -->
-                            <button type="button" 
-                                    onclick="openRejectModal()"
-                                    class="w-full bg-red-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center justify-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                Reject Payment
-                            </button>
-                        </div>
-                    @else
+                    <!-- Payment Status Information -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Payment Status</h2>
                         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                            <p class="text-sm text-gray-600 text-center">
-                                This payment has already been 
-                                <span class="font-semibold">{{ $statusLabels[$payment->admin_verification_status] ?? ucfirst($payment->admin_verification_status) }}</span>
+                            <p class="text-sm text-gray-600 mb-2">
+                                Current Status:
+                            </p>
+                            <p class="text-base font-semibold text-gray-900">
+                                {{ $statusLabels[$payment->admin_verification_status] ?? ucfirst($payment->admin_verification_status) }}
+                            </p>
+                            <p class="text-xs text-gray-500 mt-3">
+                                <strong>Note:</strong> Payment verification is handled by the assigned rider.
                             </p>
                         </div>
-                    @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -357,40 +327,6 @@
         <img src="{{ asset('storage/' . $payment->payment_proof_url) }}" 
              alt="Payment Proof" 
              class="max-w-full max-h-screen rounded-lg">
-    </div>
-</div>
-
-<!-- Reject Modal -->
-<div id="reject-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-        <h3 class="text-xl font-semibold text-gray-900 mb-4">Reject Payment</h3>
-        
-        <form id="reject-form" method="POST" action="{{ route('admin.payments.reject', $payment->id) }}">
-            @csrf
-            <div class="mb-4">
-                <label for="reject_notes" class="block text-sm font-medium text-gray-700 mb-2">
-                    Reason for Rejection <span class="text-red-500">*</span>
-                </label>
-                <textarea id="reject_notes" 
-                          name="admin_notes" 
-                          rows="4"
-                          required
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 resize-none"
-                          placeholder="Please provide a clear reason for rejecting this payment..."></textarea>
-            </div>
-            
-            <div class="flex gap-3">
-                <button type="button" 
-                        onclick="closeRejectModal()"
-                        class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                    Cancel
-                </button>
-                <button type="submit" 
-                        class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                    Reject Payment
-                </button>
-            </div>
-        </form>
     </div>
 </div>
 
@@ -462,41 +398,6 @@ function closeImageModal() {
     document.body.style.overflow = 'auto';
 }
 
-// Reject Modal Functions
-function openRejectModal() {
-    document.getElementById('reject-modal').classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeRejectModal() {
-    document.getElementById('reject-modal').classList.add('hidden');
-    document.getElementById('reject_notes').value = '';
-    document.body.style.overflow = 'auto';
-}
-
-// Form Submission Handling
-$('#approve-form').on('submit', function(e) {
-    if (!confirm('Are you sure you want to APPROVE this payment? This will trigger order fulfillment.')) {
-        e.preventDefault();
-        return false;
-    }
-    $(this).find('button[type="submit"]').prop('disabled', true).text('Approving...');
-});
-
-$('#reject-form').on('submit', function(e) {
-    const reason = $('#reject_notes').val().trim();
-    if (!reason) {
-        e.preventDefault();
-        createToast('Please provide a reason for rejection', 'error');
-        return false;
-    }
-    if (!confirm('Are you sure you want to REJECT this payment? The customer will be notified.')) {
-        e.preventDefault();
-        return false;
-    }
-    $(this).find('button[type="submit"]').prop('disabled', true).text('Rejecting...');
-});
-
 // Session messages
 @if(session('success'))
     createToast("{{ session('success') }}", 'success');
@@ -508,11 +409,10 @@ $('#reject-form').on('submit', function(e) {
     createToast("{{ session('info') }}", 'info');
 @endif
 
-// Close modals on Escape key
+// Close modal on Escape key
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeImageModal();
-        closeRejectModal();
     }
 });
 </script>

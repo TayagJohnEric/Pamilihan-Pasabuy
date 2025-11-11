@@ -291,7 +291,7 @@
                 });
             });
 
-            // Add hover effects (disabled on touch devices)
+            // Add hover effects (disabled on touch devices)w
             if (!('ontouchstart' in window)) {
                 $('.rider-card').hover(
                     function() {

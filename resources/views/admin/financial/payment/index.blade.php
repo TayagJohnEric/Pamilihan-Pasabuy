@@ -1,6 +1,6 @@
 @extends('layout.admin')
 
-@section('title', 'Payment Verification - Admin')
+@section('title', 'Payments - Admin')
 
 @section('content')
 <!-- Toast Notification Container -->
@@ -13,25 +13,21 @@
         <div class="mb-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Payment Verification</h1>
+                    <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Payments</h1>
                     <p class="text-sm lg:text-base text-gray-600 mt-1">
-                        Review and verify customer payment proofs
+                        View customer payment records and transaction history
                     </p>
                 </div>
                 
                 <!-- Quick Stats -->
                 <div class="hidden sm:flex items-center space-x-4">
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2">
-                        <p class="text-xs text-yellow-600 font-medium">Pending</p>
-                        <p class="text-2xl font-bold text-yellow-900">{{ $stats['pending_count'] }}</p>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
+                        <p class="text-xs text-blue-600 font-medium">Total Payments</p>
+                        <p class="text-2xl font-bold text-blue-900">{{ $payments->total() }}</p>
                     </div>
                     <div class="bg-green-50 border border-green-200 rounded-lg px-4 py-2">
-                        <p class="text-xs text-green-600 font-medium">Approved Today</p>
-                        <p class="text-2xl font-bold text-green-900">{{ $stats['approved_today'] }}</p>
-                    </div>
-                    <div class="bg-red-50 border border-red-200 rounded-lg px-4 py-2">
-                        <p class="text-xs text-red-600 font-medium">Rejected Today</p>
-                        <p class="text-2xl font-bold text-red-900">{{ $stats['rejected_today'] }}</p>
+                        <p class="text-xs text-green-600 font-medium">Approved</p>
+                        <p class="text-2xl font-bold text-green-900">{{ $stats['approved_today'] ?? 0 }}</p>
                     </div>
                 </div>
             </div>
@@ -61,10 +57,9 @@
                     <select name="filter_status" 
                             class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             onchange="this.form.submit()">
-                        <option value="pending_review" {{ $filterStatus === 'pending_review' ? 'selected' : '' }}>Pending Review</option>
+                        <option value="all" {{ $filterStatus === 'all' ? 'selected' : '' }}>All Payments</option>
                         <option value="approved" {{ $filterStatus === 'approved' ? 'selected' : '' }}>Approved</option>
                         <option value="rejected" {{ $filterStatus === 'rejected' ? 'selected' : '' }}>Rejected</option>
-                        <option value="all" {{ $filterStatus === 'all' ? 'selected' : '' }}>All Payments</option>
                     </select>
                 </div>
                 
@@ -95,7 +90,7 @@
                     @if(request('search'))
                         No payments match your search criteria.
                     @else
-                        There are no pending payment verifications at the moment.
+                        There are no payment records at the moment.
                     @endif
                 </p>
             </div>
@@ -186,7 +181,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                             </svg>
-                                            Review
+                                            View Details
                                         </a>
                                     </td>
                                 </tr>
