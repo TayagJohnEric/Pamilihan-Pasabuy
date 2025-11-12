@@ -18,15 +18,15 @@
 
     <!-- Notification Dropdown -->
     <div id="notification-dropdown"
-        class="hidden absolute right-0 mt-2 w-80 max-w-[90vw] bg-white rounded-lg shadow-lg border border-gray-200 z-50 transform scale-95 opacity-0 transition-all duration-200 origin-top-right">
-        <div class="flex justify-between items-center p-4 border-b border-gray-200 rounded-t-lg">
-            <h3 class="text-lg font-semibold text-gray-800">Notifications</h3>
-            <div class="flex items-center space-x-2">
-                <button id="mark-all-read" class="text-sm text-green-600 hover:text-green-700 font-medium">
+        class="hidden fixed md:absolute right-2 md:right-0 left-2 md:left-auto mt-2 md:w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 transform scale-95 opacity-0 transition-all duration-200 origin-top-right">
+        <div class="flex justify-between items-center p-3 md:p-4 border-b border-gray-200 rounded-t-lg">
+            <h3 class="text-base md:text-lg font-semibold text-gray-800">Notifications</h3>
+            <div class="flex items-center space-x-1 md:space-x-2">
+                <button id="mark-all-read" class="text-xs md:text-sm text-green-600 hover:text-green-700 font-medium whitespace-nowrap">
                     Mark all as read
                 </button>
-                <button id="close-notification-dropdown" type="button" class="text-gray-500 hover:text-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                <button id="close-notification-dropdown" type="button" class="text-gray-500 hover:text-gray-700 flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
@@ -34,11 +34,11 @@
                 </button>
             </div>
         </div>
-        <div id="notification-list" class="max-h-64 overflow-y-auto">
+        <div id="notification-list" class="max-h-60 md:max-h-64 overflow-y-auto">
             @forelse ($notifications as $notification)
-                <div class="p-4 border-b border-gray-100 hover:bg-gray-50 flex justify-between items-start cursor-pointer notification-item"
+                <div class="p-3 md:p-4 border-b border-gray-100 hover:bg-gray-50 flex justify-between items-start cursor-pointer notification-item"
                     data-id="{{ $notification->id }}" data-type="{{ $notification->type }}">
-                    <div class="flex items-start space-x-3">
+                    <div class="flex items-start space-x-2 md:space-x-3 flex-1 min-w-0">
                         <!-- Notification Type Icon -->
                         <div class="flex-shrink-0 mt-1">
                             @switch($notification->type)
@@ -76,13 +76,13 @@
                             @endswitch
                         </div>
                         
-                        <div class="flex-1">
-                            <p class="text-sm font-medium text-gray-800">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs md:text-sm font-medium text-gray-800 break-words">
                                 {{ $notification->title ?? 'New Notification' }}
                             </p>
                             
                             <!-- Message content based on notification type -->
-                            <p class="text-sm text-gray-600">
+                            <p class="text-xs md:text-sm text-gray-600 break-words">
                                 @if(is_array($notification->message))
                                     @switch($notification->type)
                                         @case('order_processing')
@@ -152,46 +152,46 @@
                     <!-- Action links based on notification type -->
                     @if(in_array($notification->type, ['order_processing', 'rider_assigned', 'payment_failed', 'order_failed', 'rider_assignment_delayed']) && isset($notification->message['order_id']))
                         <a href="{{ route('customer.orders.show', ['order' => $notification->message['order_id']]) }}"
-                            class="text-green-600 hover:text-green-700 text-sm font-medium ml-2 flex-shrink-0">
+                            class="text-green-600 hover:text-green-700 text-xs md:text-sm font-medium ml-1 md:ml-2 flex-shrink-0">
                             View
                         </a>
                     @elseif(in_array($notification->type, ['new_payment_review', 'payment_pending_review']))
                         @if(auth()->user()->role === 'admin')
                             <a href="{{ route('admin.payments.pending') }}"
-                                class="text-orange-600 hover:text-orange-700 text-sm font-medium ml-2 flex-shrink-0">
+                                class="text-orange-600 hover:text-orange-700 text-xs md:text-sm font-medium ml-1 md:ml-2 flex-shrink-0">
                                 View
                             </a>
                         @endif
                     @elseif(in_array($notification->type, ['rider_payout_paid', 'rider_payout_failed']) && isset($notification->message['payout_id']))
                         @if(auth()->user()->role === 'admin')
                             <a href="{{ route('admin.payouts.riders.show', ['id' => $notification->message['payout_id']]) }}"
-                                class="text-blue-600 hover:text-blue-700 text-sm font-medium ml-2 flex-shrink-0">
+                                class="text-blue-600 hover:text-blue-700 text-xs md:text-sm font-medium ml-1 md:ml-2 flex-shrink-0">
                                 View
                             </a>
                         @else
-                            <span class="text-green-600 text-sm font-medium ml-2 flex-shrink-0">
+                            <span class="text-green-600 text-xs md:text-sm font-medium ml-1 md:ml-2 flex-shrink-0">
                                 Payout
                             </span>
                         @endif
                     @elseif(in_array($notification->type, ['vendor_payout_paid', 'vendor_payout_failed']) && isset($notification->message['payout_id']))
                         @if(auth()->user()->role === 'admin')
                             <a href="{{ route('admin.payouts.vendors.show', ['id' => $notification->message['payout_id']]) }}"
-                                class="text-blue-600 hover:text-blue-700 text-sm font-medium ml-2 flex-shrink-0">
+                                class="text-blue-600 hover:text-blue-700 text-xs md:text-sm font-medium ml-1 md:ml-2 flex-shrink-0">
                                 View
                             </a>
                         @else
-                            <span class="text-green-600 text-sm font-medium ml-2 flex-shrink-0">
+                            <span class="text-green-600 text-xs md:text-sm font-medium ml-1 md:ml-2 flex-shrink-0">
                                 Payout
                             </span>
                         @endif
                     @endif
                 </div>
             @empty
-                <p class="p-4 text-gray-500 text-sm">No new notifications</p>
+                <p class="p-3 md:p-4 text-gray-500 text-xs md:text-sm">No new notifications</p>
             @endforelse
         </div>
-        <div class="p-3 border-t border-gray-200">
-            <button class="w-full text-center text-sm text-green-600 hover:text-green-700 font-medium">
+        <div class="p-2 md:p-3 border-t border-gray-200">
+            <button class="w-full text-center text-xs md:text-sm text-green-600 hover:text-green-700 font-medium">
                 View All Notifications
             </button>
         </div>
