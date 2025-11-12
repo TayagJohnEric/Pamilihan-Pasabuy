@@ -53,26 +53,27 @@
     }
 </style>
 
-<div class="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 animate-slide-in">
-    <!-- Enhanced Breadcrumb -->
-    <nav class="flex mb-8 text-sm" aria-label="Breadcrumb">
-        <ol class="inline-flex items-center space-x-1 md:space-x-3 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm border border-gray-100">
-            <li class="inline-flex items-center">
-                <a href="{{ route('products.index') }}" 
-                   class="text-gray-600 hover:text-emerald-600 transition-colors duration-200 font-medium flex items-center">
-                    Shop
-                </a>
-            </li>
-            <li>
-                <div class="flex items-center">
-                    <svg class="w-4 h-4 text-gray-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="text-gray-700 font-semibold">{{ $vendor->vendor_name }}</span>
-                </div>
-            </li>
-        </ol>
-    </nav>
+<div class="max-w-[90rem] mx-auto animate-slide-in">
+   <!-- Enhanced Breadcrumb -->
+        <nav class="hidden sm:flex mb-8 text-sm" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm border border-gray-100">
+                <li class="inline-flex items-center">
+                    <a href="{{ route('products.index') }}" 
+                    class="text-gray-600 hover:text-emerald-600 transition-colors duration-200 font-medium flex items-center">
+                        Shop
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 text-gray-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="text-gray-700 font-semibold">{{ $vendor->vendor_name }}</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
 
     <!-- Enhanced Vendor Header -->
     <div class="glass-effect rounded-2xl shadow-luxury mb-10 overflow-hidden border border-white/20 animate-fade-scale">
@@ -132,7 +133,9 @@
                 <div class="flex-1 pt-6">
                     <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
                         <div class="flex-1">
-                            <h1 class="text-3xl sm:text-4xl font-bold text-white mb-3 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text">{{ $vendor->vendor_name }}</h1>
+                            <h1 class="text-3xl sm:text-4xl font-bold text-black sm:text-white mb-3">
+                                {{ $vendor->vendor_name }}
+                            </h1>
                             
                             <!-- Enhanced Info Tags -->
                             <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600 mb-4">
@@ -330,15 +333,7 @@
                                         <span class="text-xs text-gray-500 ml-1">/ {{ $product->unit }}</span>
                                 </div>
                                 
-                                <!-- Rating -->
-                                @if($product->vendor->average_rating)
-                                    <div class="flex items-center text-sm text-gray-600  py-1 rounded-lg ">
-                                        <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                        <span class="font-medium">{{ number_format($product->vendor->average_rating, 1) }}</span>
-                                    </div>
-                                @endif
+                
                             </div>
                         </a>
                     @endforeach

@@ -13,46 +13,47 @@
 @section('title', $product->product_name . ' - ' . $product->vendor->vendor_name)
 @section('content')
 
-<div class="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">
+<div class="max-w-[90rem] mx-auto ">
     {{-- Toast Notification Container --}}
     <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-    {{-- Breadcrumb Navigation --}}
-    <nav class="flex mb-6 text-sm" aria-label="Breadcrumb">
-        <ol class="inline-flex items-center space-x-1 md:space-x-3">
-            <li class="inline-flex items-center">
-                <a href="{{ route('products.index') }}" 
+   {{-- Breadcrumb Navigation --}}
+<nav class="hidden sm:flex mb-6 text-sm" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+            <a href="{{ route('products.index') }}" 
+               class="text-gray-600 hover:text-emerald-600 transition-colors">
+                Home
+            </a>
+        </li>
+        
+        {{-- Category Breadcrumb --}}
+        @if($product->category)
+        <li>
+            <div class="flex items-center">
+                <svg class="w-4 h-4 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+                <a href="{{ route('products.category', $product->category->id) }}" 
                    class="text-gray-600 hover:text-emerald-600 transition-colors">
-                    Home
+                    {{ $product->category->category_name }}
                 </a>
-            </li>
-            
-            {{-- Category Breadcrumb --}}
-            @if($product->category)
-            <li>
-                <div class="flex items-center">
-                    <svg class="w-4 h-4 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                    </svg>
-                    <a href="{{ route('products.category', $product->category->id) }}" 
-                       class="text-gray-600 hover:text-emerald-600 transition-colors">
-                        {{ $product->category->category_name }}
-                    </a>
-                </div>
-            </li>
-            @endif
-            
-            {{-- Current Product --}}
-            <li>
-                <div class="flex items-center">
-                    <svg class="w-4 h-4 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="text-gray-500" aria-current="page">{{ $product->product_name }}</span>
-                </div>
-            </li>
-        </ol>
-    </nav>
+            </div>
+        </li>
+        @endif
+        
+        {{-- Current Product --}}
+        <li>
+            <div class="flex items-center">
+                <svg class="w-4 h-4 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-gray-500" aria-current="page">{{ $product->product_name }}</span>
+            </div>
+        </li>
+    </ol>
+</nav>
+
 
     {{-- Main Product Card --}}
 <div class="bg-white rounded-xl shadow overflow-hidden border border-gray-100 mb-10 max-w-[90rem] mx-auto">

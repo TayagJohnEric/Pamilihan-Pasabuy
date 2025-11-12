@@ -45,8 +45,8 @@
         <div class="mb-8">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">My Saved Addresses</h1>
-                    <p class="mt-2 text-gray-600 text-sm">Manage your delivery addresses for faster checkout</p>
+                     <h1 class="text-xl sm:text-2xl font-bold text-gray-900">My Saved Addresses</h1>
+                    <p class="mt-1 text-xs sm:text-sm text-gray-600">Manage your delivery addresses for faster checkout</p>
                 </div>
                 <button 
     type="button"

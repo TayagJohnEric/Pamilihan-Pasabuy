@@ -3,12 +3,12 @@
 @section('title', 'Rate Order #' . $order->id)
 
 @section('content')
-    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-gray-50 ">
         <div class="max-w-[90rem] mx-auto">
             <!-- Header Section -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-8">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-2 h-8 bg-gradient-to-b from-emerald-400 to-emerald-600 rounded-full"></div>
+                   
                     <div>
                         <h2 class="text-2xl sm:text-2xl font-bold text-gray-900">Rate Your Experience</h2>
                         <p class="text-gray-600 mt-1">Help us improve by sharing your feedback about Order #{{ $order->id }}</p>
@@ -151,7 +151,6 @@
                     @if($order->rider)
                         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-8">
                             <div class="flex items-center gap-3 mb-6">
-                                <div class="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
                                 <h3 class="text-xl font-bold text-gray-900">Rate Your Rider</h3>
                             </div>
                             
@@ -219,7 +218,6 @@
                     @if($vendors->count() > 0)
                         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-8">
                             <div class="flex items-center gap-3 mb-6">
-                                <div class="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
                                 <h3 class="text-xl font-bold text-gray-900">Rate the Vendors</h3>
                             </div>
                             

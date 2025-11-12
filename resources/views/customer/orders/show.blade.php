@@ -3,7 +3,7 @@
 @section('title', 'Order #' . $order->id)
 
 @section('content')
-    <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-gray-50 ">
         <div class="max-w-[90rem] mx-auto">
             <!-- Header Section -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-8">
