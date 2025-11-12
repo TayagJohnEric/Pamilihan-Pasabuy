@@ -25,22 +25,19 @@
             </div>
         @endif
 
-        <div class="bg-white rounded-xl shadow overflow-hidden">
+        <div class=" overflow-hidden">
             <!-- Header -->
-            <div class="bg-gradient-to-r from-emerald-600 via-emerald-600 to-teal-600 px-6 py-6">
+            <div class="mb-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-2xl font-bold text-white">Edit Profile</h1>
-                        <p class="text-green-100 mt-1">Update your personal and rider information</p>
+                        <h1 class="text-2xl font-bold text-gray-900">Edit Profile</h1>
+                        <p class="text-gray-600 mt-1">Update your personal and rider information</p>
                     </div>
-                    <a href="{{ route('rider.profile.show') }}" class="bg-white text-green-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-50 transition duration-200 shadow-md">
-                        Cancel
-                    </a>
                 </div>
             </div>
 
             <!-- Form -->
-            <form action="{{ route('rider.profile.update') }}" method="POST" enctype="multipart/form-data" class="p-6">
+            <form action="{{ route('rider.profile.update') }}" method="POST" enctype="multipart/form-data" class="">
                 @csrf
                 @method('PUT')
 

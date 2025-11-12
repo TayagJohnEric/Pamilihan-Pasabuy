@@ -7,7 +7,7 @@
 <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2 max-w-sm w-full pointer-events-none"></div>
 
 <div class="min-h-screen bg-gray-50 py-6">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto ">
         
         <!-- Back Button -->
         <div class="mb-6">

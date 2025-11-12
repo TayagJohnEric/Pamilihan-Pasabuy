@@ -10,7 +10,7 @@
                 <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6">
                     <div class="flex-1">
                         <div class="flex items-center gap-3 mb-3">
-                            <div class="w-2 h-8 bg-gradient-to-b from-emerald-400 to-emerald-600 rounded-full"></div>
+                            
                             <h1 class="text-2xl sm:text-2xl font-bold text-gray-900">Order #{{ $order->id }}</h1>
                         </div>
                         <p class="text-gray-600 text-sm sm:text-base">
@@ -173,7 +173,7 @@
                     <!-- Order Items -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
                         <div class="flex items-center gap-3 mb-6">
-                            <div class="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                           
                             <h2 class="text-xl font-bold text-gray-900">Order Items</h2>
                         </div>
                         
@@ -296,7 +296,6 @@
                     @if($order->statusHistory->count() > 0)
                         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
                             <div class="flex items-center gap-3 mb-6">
-                                <div class="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
                                 <h2 class="text-xl font-bold text-gray-900">Order Timeline</h2>
                             </div>
                             
@@ -369,7 +368,6 @@
                     @if($order->special_instructions)
                         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
                             <div class="flex items-center gap-3 mb-4">
-                                <div class="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
                                 <h2 class="text-xl font-bold text-gray-900">Special Instructions</h2>
                             </div>
                             <div class="bg-amber-50 rounded-xl p-4 border border-amber-200">
@@ -384,7 +382,6 @@
                     <!-- Order Summary -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                         <div class="flex items-center gap-3 mb-6">
-                            <div class="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
                             <h2 class="text-lg font-bold text-gray-900">Order Summary</h2>
                         </div>
                         
@@ -426,7 +423,6 @@
                     <!-- Delivery Information -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                         <div class="flex items-center gap-3 mb-6">
-                            <div class="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
                             <h2 class="text-lg font-bold text-gray-900">Delivery Information</h2>
                         </div>
                         
@@ -482,7 +478,6 @@
                     @if($order->payment)
                         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                             <div class="flex items-center gap-3 mb-6">
-                                <div class="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
                                 <h2 class="text-lg font-bold text-gray-900">Payment Details</h2>
                             </div>
                             
