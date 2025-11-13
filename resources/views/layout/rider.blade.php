@@ -77,12 +77,11 @@
             
             <!-- Main Content -->
             <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
-                <!-- GCash Information Reminder -->
-                @include('components.rider.gcash-reminder')
-
                  @yield('content')
-
             </main>
+            
+            <!-- GCash Information Reminder Modal (outside main content) -->
+            @include('components.rider.gcash-reminder')
         </div>
     </div>
 
