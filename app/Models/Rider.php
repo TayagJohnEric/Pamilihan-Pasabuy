@@ -49,4 +49,15 @@ class Rider extends Model
     {
         return $this->morphMany(Rating::class, 'rateable');
     }
+
+    /**
+     * Check if rider has incomplete GCash information
+     * Returns true if any of the GCash fields are missing
+     */
+    public function hasIncompleteGCashInfo()
+    {
+        return empty($this->gcash_number) || 
+               empty($this->gcash_qr_path) || 
+               empty($this->gcash_name);
+    }
 }

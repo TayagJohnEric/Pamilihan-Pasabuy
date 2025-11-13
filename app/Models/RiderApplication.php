@@ -40,4 +40,20 @@ class RiderApplication extends Model
     {
         return $this->belongsTo(User::class, 'reviewed_by_user_id');
     }
+
+    // Helper methods to get full URLs for documents
+    public function getNbiClearanceFullUrl()
+    {
+        return $this->nbi_clearance_url ? \Storage::url($this->nbi_clearance_url) : null;
+    }
+
+    public function getValidIdFullUrl()
+    {
+        return $this->valid_id_url ? \Storage::url($this->valid_id_url) : null;
+    }
+
+    public function getSelfieWithIdFullUrl()
+    {
+        return $this->selfie_with_id_url ? \Storage::url($this->selfie_with_id_url) : null;
+    }
 }
