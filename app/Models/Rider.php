@@ -56,8 +56,6 @@ class Rider extends Model
      */
     public function hasIncompleteGCashInfo()
     {
-        return empty($this->gcash_number) || 
-               empty($this->gcash_qr_path) || 
-               empty($this->gcash_name);
+        return empty($this->gcash_number);
     }
 }

@@ -293,13 +293,13 @@ class RiderPaymentController extends Controller
             'user_id' => $payment->order->customer_user_id,
             'type' => 'payment_verified',
             'title' => 'Payment Confirmed!',
-            'data' => [
+            'message' => [
                 'order_id' => $payment->order->id,
                 'message' => 'Your payment has been confirmed by the rider. Your order will be picked up and delivered soon.',
                 'amount' => $payment->amount_paid,
             ],
-            'related_type' => Order::class,
-            'related_id' => $payment->order->id,
+            'related_entity_type' => Order::class,
+            'related_entity_id' => $payment->order->id,
         ]);
     }
     
@@ -312,13 +312,14 @@ class RiderPaymentController extends Controller
             'user_id' => $payment->order->customer_user_id,
             'type' => 'payment_rejected',
             'title' => 'Payment Verification Issue',
-            'data' => [
+            'message' => [
                 'order_id' => $payment->order->id,
                 'message' => 'The rider has not received your payment. Please check your GCash transaction and resubmit proof if needed.',
                 'reason' => $reason,
+                'payment_id' => $payment->id,
             ],
-            'related_type' => Order::class,
-            'related_id' => $payment->order->id,
+            'related_entity_type' => Order::class,
+            'related_entity_id' => $payment->order->id,
         ]);
     }
     
@@ -334,14 +335,14 @@ class RiderPaymentController extends Controller
                 'user_id' => $admin->id,
                 'type' => 'payment_verified_by_rider',
                 'title' => 'Payment Verified by Rider',
-                'data' => [
+                'message' => [
                     'order_id' => $payment->order->id,
                     'rider_name' => $payment->order->rider->name,
                     'amount' => $payment->amount_paid,
                     'message' => 'Rider has confirmed payment receipt for Order #' . $payment->order->id,
                 ],
-                'related_type' => Payment::class,
-                'related_id' => $payment->id,
+                'related_entity_type' => Payment::class,
+                'related_entity_id' => $payment->id,
             ]);
         }
     }
@@ -358,7 +359,7 @@ class RiderPaymentController extends Controller
                 'user_id' => $admin->id,
                 'type' => 'payment_dispute',
                 'title' => 'Payment Dispute - Requires Review',
-                'data' => [
+                'message' => [
                     'order_id' => $payment->order->id,
                     'rider_name' => $payment->order->rider->name,
                     'customer_name' => $payment->order->customer->name,
@@ -366,8 +367,8 @@ class RiderPaymentController extends Controller
                     'reason' => $reason,
                     'message' => 'Rider reports payment not received for Order #' . $payment->order->id . '. Please review and resolve.',
                 ],
-                'related_type' => Payment::class,
-                'related_id' => $payment->id,
+                'related_entity_type' => Payment::class,
+                'related_entity_id' => $payment->id,
             ]);
         }
     }
@@ -391,13 +392,13 @@ class RiderPaymentController extends Controller
                     'user_id' => $vendorUserId,
                     'type' => 'order_ready_for_pickup',
                     'title' => 'Order Ready for Pickup',
-                    'data' => [
+                    'message' => [
                         'order_id' => $order->id,
                         'rider_name' => $order->rider->name ?? 'Rider',
                         'message' => 'Payment confirmed. Rider will pick up items soon.',
                     ],
-                    'related_type' => Order::class,
-                    'related_id' => $order->id,
+                    'related_entity_type' => Order::class,
+                    'related_entity_id' => $order->id,
                 ]);
             } catch (\Exception $e) {
                 Log::warning('Failed to notify vendor', [
