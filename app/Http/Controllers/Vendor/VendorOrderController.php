@@ -125,6 +125,45 @@ class VendorOrderController extends Controller
         return view('vendor.orders.show', compact('order'));
     }
 
+    public function deliveredShow(Order $order)
+    {
+        $vendor = Auth::user()->vendor;
+        
+        if (!$vendor) {
+            return redirect()->route('vendor.dashboard')->with('error', 'Vendor profile not found.');
+        }
+
+        // Ensure we only show delivered orders in read-only mode
+        if ($order->status !== 'delivered') {
+            return redirect()->route('vendor.orders.show', $order)->with('error', 'Order is not delivered yet.');
+        }
+
+        // Check if this vendor has items in this order
+        $hasVendorItems = $order->orderItems()
+            ->whereHas('product', function($query) use ($vendor) {
+                $query->where('vendor_id', $vendor->id);
+            })
+            ->exists();
+
+        if (!$hasVendorItems) {
+            return redirect()->route('vendor.orders.delivered')->with('error', 'Order not found or does not contain your items.');
+        }
+
+        // Load order with related data, filtering items to only this vendor's items
+        $order->load([
+            'customer',
+            'rider',
+            'deliveryAddress.district',
+            'orderItems' => function($query) use ($vendor) {
+                $query->whereHas('product', function($q) use ($vendor) {
+                    $q->where('vendor_id', $vendor->id);
+                })->with('product');
+            }
+        ]);
+
+        return view('vendor.orders.delivered-show', compact('order'));
+    }
+
     /**
      * Update individual order item status and fulfillment details
      * Handles both regular and budget-based items

@@ -10,23 +10,24 @@
                 <p class="text-gray-600">Track your customer satisfaction and feedback</p>
             </div>
             
-            <!-- Filter Form -->
-            <div class="mt-4 lg:mt-0">
-                <form method="GET" class="flex flex-col sm:flex-row gap-3">
-                    <select name="rating_filter" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="all" {{ request('rating_filter', 'all') == 'all' ? 'selected' : '' }}>All Ratings</option>
-                        <option value="5" {{ request('rating_filter') == '5' ? 'selected' : '' }}>5 Stars</option>
-                        <option value="4" {{ request('rating_filter') == '4' ? 'selected' : '' }}>4 Stars</option>
-                        <option value="3" {{ request('rating_filter') == '3' ? 'selected' : '' }}>3 Stars</option>
-                        <option value="2" {{ request('rating_filter') == '2' ? 'selected' : '' }}>2 Stars</option>
-                        <option value="1" {{ request('rating_filter') == '1' ? 'selected' : '' }}>1 Star</option>
-                    </select>
-                   <button type="submit" 
-                        class="bg-gradient-to-r from-emerald-600 via-emerald-600 to-teal-600 text-white px-6 py-2 rounded-lg hover:from-emerald-700 hover:via-emerald-700 hover:to-teal-700 transition-all duration-300 shadow-sm hover:shadow-md">
-                        Filter
-                    </button>
-                </form>
-            </div>
+           <!-- Filter Form -->
+<div class="hidden lg:block mt-4 lg:mt-0">
+    <form method="GET" class="flex flex-col sm:flex-row gap-3">
+        <select name="rating_filter" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="all" {{ request('rating_filter', 'all') == 'all' ? 'selected' : '' }}>All Ratings</option>
+            <option value="5" {{ request('rating_filter') == '5' ? 'selected' : '' }}>5 Stars</option>
+            <option value="4" {{ request('rating_filter') == '4' ? 'selected' : '' }}>4 Stars</option>
+            <option value="3" {{ request('rating_filter') == '3' ? 'selected' : '' }}>3 Stars</option>
+            <option value="2" {{ request('rating_filter') == '2' ? 'selected' : '' }}>2 Stars</option>
+            <option value="1" {{ request('rating_filter') == '1' ? 'selected' : '' }}>1 Star</option>
+        </select>
+        <button type="submit" 
+            class="bg-gradient-to-r from-emerald-600 via-emerald-600 to-teal-600 text-white px-6 py-2 rounded-lg hover:from-emerald-700 hover:via-emerald-700 hover:to-teal-700 transition-all duration-300 shadow-sm hover:shadow-md">
+            Filter
+        </button>
+    </form>
+</div>
+
         </div>
 
         <!-- Rating Statistics -->

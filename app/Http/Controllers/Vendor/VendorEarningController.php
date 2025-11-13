@@ -21,46 +21,114 @@ class VendorEarningController extends Controller
             return redirect()->route('vendor.dashboard')->with('error', 'Vendor profile not found.');
         }
 
-        // Calculate stats from delivered and paid orders
+        // Calculate stats from paid orders (lifetime)
         $totalStats = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->where('products.vendor_id', $vendor->id)
-            ->where('orders.status', 'delivered')
-            ->where('orders.payment_status', 'paid')
+            ->where(function ($q) {
+                $q->where('orders.payment_status', 'paid')
+                  ->orWhere(function ($q2) {
+                      $q2->where('orders.payment_method', 'cod')
+                         ->where('orders.status', 'delivered');
+                  });
+            })
             ->selectRaw('
-                SUM(order_items.actual_item_price * order_items.quantity_requested) as total_sales,
-                SUM(order_items.actual_item_price * order_items.quantity_requested * 0.10) as total_commission,
-                SUM(order_items.actual_item_price * order_items.quantity_requested * 0.90) as total_earned,
+                SUM(COALESCE(order_items.actual_item_price, order_items.customer_budget_requested, order_items.unit_price_snapshot * order_items.quantity_requested)) as total_sales,
+                SUM(COALESCE(order_items.actual_item_price, order_items.customer_budget_requested, order_items.unit_price_snapshot * order_items.quantity_requested) * 0.10) as total_commission,
+                SUM(COALESCE(order_items.actual_item_price, order_items.customer_budget_requested, order_items.unit_price_snapshot * order_items.quantity_requested) * 0.90) as total_earned,
                 COUNT(DISTINCT orders.id) as total_orders
             ')
             ->first();
 
-        // Current period starts from beginning of current month
-        $currentPeriodStart = Carbon::now()->startOfMonth();
-        $currentPeriodSales = $this->calculateCurrentPeriodSales($vendor->id, $currentPeriodStart);
+        // Weekly and Monthly period stats
+        $weeklyStart = Carbon::now()->startOfWeek();
+        $monthlyStart = Carbon::now()->startOfMonth();
+
+        $weeklyStats = $this->calculatePeriodStats($vendor->id, $weeklyStart);
+        $monthlyStats = $this->calculatePeriodStats($vendor->id, $monthlyStart);
+
+        // Provide safe defaults to avoid null property access in the view
+        if (!$totalStats) {
+            $totalStats = (object) [
+                'total_sales' => 0,
+                'total_commission' => 0,
+                'total_earned' => 0,
+                'total_orders' => 0,
+            ];
+        }
+
+        if (!$weeklyStats) {
+            $weeklyStats = (object) [
+                'order_count' => 0,
+                'gross_sales' => 0,
+                'net_earned' => 0,
+            ];
+        }
+
+        if (!$monthlyStats) {
+            $monthlyStats = (object) [
+                'order_count' => 0,
+                'gross_sales' => 0,
+                'net_earned' => 0,
+            ];
+        }
+
+        // Insights
+        $avgEarningsPerOrder = ($totalStats && $totalStats->total_orders)
+            ? ($totalStats->total_earned / $totalStats->total_orders)
+            : 0;
+
+        // Recent earnings (last 5 paid orders for this vendor)
+        $recentEarnings = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->where('products.vendor_id', $vendor->id)
+            ->where(function ($q) {
+                $q->where('orders.payment_status', 'paid')
+                  ->orWhere(function ($q2) {
+                      $q2->where('orders.payment_method', 'cod')
+                         ->where('orders.status', 'delivered');
+                  });
+            })
+            ->selectRaw('
+                orders.id as order_id,
+                orders.created_at as ordered_at,
+                SUM(COALESCE(order_items.actual_item_price, order_items.customer_budget_requested, order_items.unit_price_snapshot * order_items.quantity_requested) * 0.90) as net_earned,
+                SUM(order_items.quantity_requested) as items_count
+            ')
+            ->groupBy('orders.id', 'orders.created_at')
+            ->orderBy('orders.created_at', 'desc')
+            ->limit(5)
+            ->get();
 
         return view('vendor.earnings.index', compact(
-            'currentPeriodSales',
             'totalStats',
-            'currentPeriodStart'
+            'weeklyStats',
+            'monthlyStats',
+            'avgEarningsPerOrder',
+            'recentEarnings'
         ));
     }
 
     /**
-     * Calculate current period sales
+     * Calculate stats within a period [startDate, now]
      */
-    private function calculateCurrentPeriodSales($vendorId, $startDate)
+    private function calculatePeriodStats($vendorId, $startDate)
     {
         return OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->where('products.vendor_id', $vendorId)
-            ->where('orders.status', 'delivered')
-            ->where('orders.payment_status', 'paid')
+            ->where(function ($q) {
+                $q->where('orders.payment_status', 'paid')
+                  ->orWhere(function ($q2) {
+                      $q2->where('orders.payment_method', 'cod')
+                         ->where('orders.status', 'delivered');
+                  });
+            })
             ->where('orders.created_at', '>=', $startDate)
             ->selectRaw('
                 COUNT(DISTINCT orders.id) as order_count,
-                SUM(order_items.actual_item_price * order_items.quantity_requested) as total_sales,
-                SUM(order_items.actual_item_price * order_items.quantity_requested * 0.10) as estimated_commission
+                SUM(COALESCE(order_items.actual_item_price, order_items.customer_budget_requested, order_items.unit_price_snapshot * order_items.quantity_requested)) as gross_sales,
+                SUM(COALESCE(order_items.actual_item_price, order_items.customer_budget_requested, order_items.unit_price_snapshot * order_items.quantity_requested) * 0.90) as net_earned
             ')
             ->first();
     }

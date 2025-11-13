@@ -294,6 +294,10 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->g
         Route::get('/delivered', [VendorOrderController::class, 'delivered'])
             ->name('delivered');
         
+        // Show delivered order details (read-only)
+        Route::get('/delivered/{order}', [VendorOrderController::class, 'deliveredShow'])
+            ->name('delivered.show');
+        
         // Show detailed view of specific order
         Route::get('/{order}', [VendorOrderController::class, 'show'])
             ->name('show');
