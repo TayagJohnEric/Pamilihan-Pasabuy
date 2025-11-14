@@ -87,7 +87,8 @@ class RiderOrderController extends Controller
             'customer',
             'deliveryAddress.district',
             'orderItems.product.vendor',
-            'statusHistory.updatedBy'
+            'statusHistory.updatedBy',
+            'payment'
         ]);
 
         // Group order items by vendor for easier pickup organization

@@ -116,7 +116,7 @@
                                         @if($product->image_url)
                                             <div class="flex-shrink-0 h-12 w-12">
                                                 <img class="h-12 w-12 rounded-xl object-cover shadow-md border-2 border-white group-hover:border-emerald-200 transition-colors duration-200" 
-                                                     src="{{ $product->image_url }}" alt="{{ $product->product_name }}">
+                                                     src="{{ asset('storage/' . $product->image_url) }}" alt="{{ $product->product_name }}">
                                             </div>
                                         @else
                                             <div class="flex-shrink-0 h-12 w-12 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl flex items-center justify-center shadow-md">

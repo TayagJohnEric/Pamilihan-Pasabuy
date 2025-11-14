@@ -104,7 +104,6 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rider</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -147,13 +146,7 @@
                                             <span class="text-xs text-gray-500 italic">Not assigned</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        @if($payment->customer_reference_code)
-                                            <code class="text-xs bg-gray-100 px-2 py-1 rounded">{{ $payment->customer_reference_code }}</code>
-                                        @else
-                                            <span class="text-xs text-gray-400">N/A</span>
-                                        @endif
-                                    </td>
+                                   
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @php
                                             $statusColors = [

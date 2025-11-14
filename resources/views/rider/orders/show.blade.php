@@ -67,18 +67,29 @@
                                         </div>
                                     </button>
                                 @elseif($order->status === 'assigned')
-                                    <button id="confirm-pickup-btn" 
-                                            class="relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg sm:rounded-xl hover:bg-blue-700 font-semibold text-sm transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 w-full lg:w-auto"
-                                            data-order-id="{{ $order->id }}">
-                                        <span class="button-text">Confirm Pickup</span>
-                                        <div class="button-loading hidden flex items-center justify-center">
-                                            <svg class="animate-spin h-4 w-4 text-white mr-2" fill="none" viewBox="0 0 24 24">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    @if($order->payment_method === 'online_payment' && $order->payment && $order->payment->rider_verification_status !== 'verified')
+                                        <button disabled 
+                                                class="relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 bg-gray-400 text-white rounded-lg sm:rounded-xl font-semibold text-sm cursor-not-allowed opacity-75 w-full lg:w-auto"
+                                                title="Payment verification required before pickup">
+                                            <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                                             </svg>
-                                            <span>Processing...</span>
-                                        </div>
-                                    </button>
+                                            <span>Payment Verification Required</span>
+                                        </button>
+                                    @else
+                                        <button id="confirm-pickup-btn" 
+                                                class="relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg sm:rounded-xl hover:bg-blue-700 font-semibold text-sm transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 w-full lg:w-auto"
+                                                data-order-id="{{ $order->id }}">
+                                            <span class="button-text">Confirm Pickup</span>
+                                            <div class="button-loading hidden flex items-center justify-center">
+                                                <svg class="animate-spin h-4 w-4 text-white mr-2" fill="none" viewBox="0 0 24 24">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                <span>Processing...</span>
+                                            </div>
+                                        </button>
+                                    @endif
                                 @elseif($order->status === 'pickup_confirmed')
                                     <button id="start-delivery-btn" 
                                             class="relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 bg-indigo-600 text-white rounded-lg sm:rounded-xl hover:bg-indigo-700 font-semibold text-sm transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 w-full lg:w-auto"
@@ -368,6 +379,47 @@
                         </div>
                     </div>
 
+                    <!-- Payment Confirmation Reminder -->
+                    @if($order->payment_method === 'online_payment' && $order->payment && $order->payment->rider_verification_status !== 'verified')
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl shadow-sm overflow-hidden">
+                            <div class="px-4 sm:px-6 py-4 sm:py-6">
+                                <div class="flex items-start space-x-3 sm:space-x-4">
+                                    <div class="flex-shrink-0">
+                                        <div class="p-2 bg-amber-100 rounded-lg">
+                                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="text-lg sm:text-xl font-bold text-amber-900 mb-2">Payment Confirmation Required</h3>
+                                        <p class="text-amber-800 text-sm sm:text-base mb-3">
+                                            You must verify the customer's payment before proceeding with the delivery process.
+                                        </p>
+                                        <div class="flex flex-col sm:flex-row gap-3">
+                                            @if($order->payment->rider_verification_status === 'pending')
+                                                <a href="{{ route('rider.payments.show', $order->payment) }}" 
+                                                   class="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 bg-amber-600 text-white rounded-lg sm:rounded-xl hover:bg-amber-700 font-semibold text-sm transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                                                    <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    Verify Payment Now
+                                                </a>
+                                            @elseif($order->payment->rider_verification_status === 'rejected')
+                                                <div class="flex items-center space-x-2 text-red-700 text-sm">
+                                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    <span>Payment verification was rejected. Please contact admin for assistance.</span>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Special Instructions -->
                     @if($order->special_instructions)
                     <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
@@ -418,12 +470,22 @@
                                 </div>
                                 <div class="flex justify-between items-center py-2">
                                     <span class="text-gray-600 font-medium text-sm">Payment Status</span>
-                                    <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold whitespace-nowrap
-                                        {{ $order->payment_status === 'pending' ? 'bg-amber-100 text-amber-700' : '' }}
-                                        {{ $order->payment_status === 'paid' ? 'bg-green-100 text-green-700' : '' }}
-                                        {{ $order->payment_status === 'failed' ? 'bg-red-100 text-red-700' : '' }}">
-                                        {{ strtoupper($order->payment_status) }}
-                                    </span>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold whitespace-nowrap
+                                            {{ $order->payment_status === 'pending' ? 'bg-amber-100 text-amber-700' : '' }}
+                                            {{ $order->payment_status === 'paid' ? 'bg-green-100 text-green-700' : '' }}
+                                            {{ $order->payment_status === 'failed' ? 'bg-red-100 text-red-700' : '' }}">
+                                            {{ strtoupper($order->payment_status) }}
+                                        </span>
+                                        @if($order->payment_method === 'online_payment' && $order->payment && $order->payment->rider_verification_status !== 'verified')
+                                            <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold whitespace-nowrap bg-amber-100 text-amber-700" title="Rider verification required">
+                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                                </svg>
+                                                {{ strtoupper($order->payment->rider_verification_status ?? 'pending') }}
+                                            </span>
+                                        @endif
+                                    </div>
                                 </div>
                                 <div class="border-t border-gray-200 pt-3 sm:pt-4">
                                     <div class="flex justify-between items-center py-2">
