@@ -51,7 +51,7 @@ class CustomerProductController extends Controller
         }
 
         // Apply sorting
-        $sortBy = $request->get('sort', 'latest');
+        $sortBy = $request->get('sort', 'random');
         switch ($sortBy) {
             case 'price_low':
                 $query->orderBy('price', 'asc');
@@ -62,8 +62,11 @@ class CustomerProductController extends Controller
             case 'name':
                 $query->orderBy('product_name', 'asc');
                 break;
-            default:
+            case 'latest':
                 $query->latest();
+                break;
+            default:
+                $query->inRandomOrder();
                 break;
         }
 
@@ -276,6 +279,9 @@ $products = $query->get();
                 break;
             case 'name':
                 $query->orderBy('product_name', 'asc');
+                break;
+            case 'random':
+                $query->inRandomOrder();
                 break;
             default:
                 $query->latest();

@@ -44,7 +44,7 @@
                             <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Your Items to Fulfill</h2>
                             <div class="flex flex-col sm:flex-row sm:items-center gap-3">
                                 <button type="button" id="bulk-ready-btn" 
-                                        class="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg sm:rounded-xl transition-colors shadow-sm hover:shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
+                                        class="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg sm:rounded-xl transition-colors shadow-sm hover:shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
                                         disabled>
                                     <span class="btn-loading hidden">
                                         <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -52,10 +52,13 @@
                                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
                                     </span>
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
                                     <span class="btn-text">Mark Selected as Ready</span>
                                 </button>
-                                <div class="inline-flex items-center justify-center px-3 py-2 bg-green-100 text-green-800 text-sm font-medium rounded-full">
-                                    <span id="selected-count">0</span> selected
+                                <div class="inline-flex items-center justify-center px-3 py-2 bg-emerald-100 text-emerald-800 text-sm font-medium rounded-full">
+                                    <span id="selected-count">0</span> <span>selected</span>
                                 </div>
                             </div>
                         </div>
