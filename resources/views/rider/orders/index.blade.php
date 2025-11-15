@@ -235,7 +235,7 @@
 
         <!-- Recent Delivery History -->
         @if($deliveryHistory->count() > 0)
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div class="mt-9">
             <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center">
                 <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
                     <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

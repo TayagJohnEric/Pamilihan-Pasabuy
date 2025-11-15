@@ -20,7 +20,10 @@
             <div class="mt-4 md:mt-0 flex items-center space-x-4">
                 <!-- Availability Toggle -->
                 <div class="flex items-center space-x-3">
-                    <span class="text-sm font-medium text-gray-700">Available for deliveries:</span>
+                   <span class="text-sm sm:text-base font-medium text-gray-700">
+                        Available for deliveries:
+                    </span>
+
                     <button 
                         id="availability-toggle" 
                         class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 {{ $dashboardStats['rider_info']['is_available'] ? 'bg-emerald-500' : 'bg-gray-300' }}"
@@ -46,18 +49,18 @@
         
        
 
-      <!-- Rider Rating Card -->
-<div class="bg-white rounded-lg shadow p-4 sm:p-6">
+         <!-- Rider Rating Card -->
+<div class="bg-white rounded-lg shadow p-3 sm:p-6">
     <div class="flex items-center">
         <div class="p-2 sm:p-3 rounded-full bg-gray-100">
-            <svg class="h-5 w-5 sm:h-6 sm:w-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="h-4 w-4 sm:h-6 sm:w-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                       d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
             </svg>
         </div>
-        <div class="ml-3 sm:ml-4">
+        <div class="ml-2 sm:ml-4">
             <p class="text-xs sm:text-sm font-medium text-gray-600">Your Rating</p>
-            <p class="text-xl sm:text-2xl font-bold text-gray-900">
+            <p class="text-lg sm:text-2xl font-bold text-gray-900">
                 {{ number_format($dashboardStats['rider_info']['rating'], 1) }}
                 <span class="text-xs sm:text-sm text-gray-500">/5.0</span>
             </p>
@@ -66,45 +69,56 @@
 </div>
 
 <!-- Total Deliveries Today Card -->
-<div class="bg-white rounded-lg shadow p-4 sm:p-6">
+<div class="bg-white rounded-lg shadow p-3 sm:p-6">
     <div class="flex items-center">
         <div class="p-2 sm:p-3 rounded-full bg-gray-100">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 lucide lucide-package-check-icon lucide-package-check"><path d="m16 16 2 2 4-4"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" x2="12" y1="22" y2="12"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="m16 16 2 2 4-4"/>
+                <path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/>
+                <path d="m7.5 4.27 9 5.15"/>
+                <polyline points="3.29 7 12 12 20.71 7"/>
+                <line x1="12" x2="12" y1="22" y2="12"/>
+            </svg>
         </div>
-        <div class="ml-3 sm:ml-4">
+        <div class="ml-2 sm:ml-4">
             <p class="text-xs sm:text-sm font-medium text-gray-600">Deliveries Today</p>
-            <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $dashboardStats['today_stats']['total_deliveries'] }}</p>
+            <p class="text-lg sm:text-2xl font-bold text-gray-900">{{ $dashboardStats['today_stats']['total_deliveries'] }}</p>
         </div>
     </div>
 </div>
 
 <!-- Today's Earnings Card -->
-<div class="bg-white rounded-lg shadow p-4 sm:p-6">
+<div class="bg-white rounded-lg shadow p-3 sm:p-6">
     <div class="flex items-center">
         <div class="p-2 sm:p-3 rounded-full bg-gray-100">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 11H4"/><path d="M20 7H4"/><path d="M7 21V4a1 1 0 0 1 1-1h4a1 1 0 0 1 0 12H7"/>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M20 11H4"/>
+                <path d="M20 7H4"/>
+                <path d="M7 21V4a1 1 0 0 1 1-1h4a1 1 0 0 1 0 12H7"/>
             </svg>
         </div>
-        <div class="ml-3 sm:ml-4">
+        <div class="ml-2 sm:ml-4">
             <p class="text-xs sm:text-sm font-medium text-gray-600">Today's Earnings</p>
-            <p class="text-xl sm:text-2xl font-bold text-gray-900">₱{{ number_format($dashboardStats['today_stats']['earnings'], 2) }}</p>
+            <p class="text-lg sm:text-2xl font-bold text-gray-900">₱{{ number_format($dashboardStats['today_stats']['earnings'], 2) }}</p>
         </div>
     </div>
 </div>
 
 <!-- Performance Score Card -->
-<div class="bg-white rounded-lg shadow p-4 sm:p-6">
+<div class="bg-white rounded-lg shadow p-3 sm:p-6">
     <div class="flex items-center">
         <div class="p-2 sm:p-3 rounded-full bg-gray-100">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 sm:h-6 sm:w-6 text-purple-600 lucide lucide-activity-icon lucide-activity"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/>
+            </svg>
         </div>
-        <div class="ml-3 sm:ml-4">
+        <div class="ml-2 sm:ml-4">
             <p class="text-xs sm:text-sm font-medium text-gray-600">Completion Rate</p>
-            <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $dashboardStats['performance']['completion_rate'] }}%</p>
+            <p class="text-lg sm:text-2xl font-bold text-gray-900">{{ $dashboardStats['performance']['completion_rate'] }}%</p>
         </div>
     </div>
 </div>
+
     </div>
 
    <!-- Today's Overview -->

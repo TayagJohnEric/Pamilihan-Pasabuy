@@ -434,24 +434,46 @@
         </button>
     </nav>
 
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden lg:hidden glass-effect border-t">
-        <div class="container mx-auto px-4 py-6 space-y-4">
-            <a href="#home" class="block text-gray-700 hover:text-green-600 py-2 font-medium">Home</a>
-            <a href="#how-it-works" class="block text-gray-700 hover:text-green-600 py-2 font-medium">How It Works</a>
-            <a href="#features" class="block text-gray-700 hover:text-green-600 py-2 font-medium">Features</a>
-            <a href="#testimonials" class="block text-gray-700 hover:text-green-600 py-2 font-medium">Reviews</a>
-            <a href="#about" class="block text-gray-700 hover:text-green-600 py-2 font-medium">About</a>
-            <div class="pt-4 border-t space-y-3">
-               
-<a href="{{ route('customer.login') }}" class="px-3 py-2.5 text-white hover:bg-white hover:text-green-600 border border-white rounded-xl transition-colors font-medium">
-                Log In
+   <!-- Mobile Menu -->
+<div id="mobile-menu" class="hidden lg:hidden glass-effect border-t">
+    <div class="container mx-auto px-4 py-6 space-y-4">
+        <!-- Navigation Links -->
+        <a href="#home" class="block text-gray-700 hover:text-green-600 py-2 font-medium transition-colors">Home</a>
+        <a href="#how-it-works" class="block text-gray-700 hover:text-green-600 py-2 font-medium transition-colors">How It Works</a>
+        <a href="#features" class="block text-gray-700 hover:text-green-600 py-2 font-medium transition-colors">Features</a>
+        <a href="#testimonials" class="block text-gray-700 hover:text-green-600 py-2 font-medium transition-colors">Reviews</a>
+        <a href="#about" class="block text-gray-700 hover:text-green-600 py-2 font-medium transition-colors">About</a>
+        
+        <!-- Login/Signup Buttons -->
+        <div class="pt-4 border-t border-gray-200 space-y-3">
+            <a href="{{ route('customer.login') }}" 
+               class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-white text-green-600 border-2 border-green-600 rounded-xl hover:bg-green-50 transition-colors font-medium shadow-sm">
+               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 lucide lucide-user-icon lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Log In as Customer
             </a>
-             <a href="{{ route('customer.register') }}" class="px-6 py-2.5 bg-gradient-to-r from-emerald-600 via-emerald-600 to-teal-600 theme text-white rounded-xl hover:bg-green-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105">
+            
+            <a href="{{ route('rider.login') }}" 
+               class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-white text-green-600 border-2 border-green-600 rounded-xl hover:bg-green-50 transition-colors font-medium shadow-sm">
+               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 lucide lucide-motorbike-icon lucide-motorbike"><path d="m18 14-1-3"/><path d="m3 9 6 2a2 2 0 0 1 2-2h2a2 2 0 0 1 1.99 1.81"/><path d="M8 17h3a1 1 0 0 0 1-1 6 6 0 0 1 6-6 1 1 0 0 0 1-1v-.75A5 5 0 0 0 17 5"/><circle cx="19" cy="17" r="3"/><circle cx="5" cy="17" r="3"/></svg>
+                Log In as Rider
+            </a>
+            
+            <a href="{{ route('vendor.login') }}" 
+               class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-white text-green-600 border-2 border-green-600 rounded-xl hover:bg-green-50 transition-colors font-medium shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 lucide lucide-store-icon lucide-store"><path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/><path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"/><path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"/></svg>
+                Log In as Vendor
+            </a>
+            
+            <a href="{{ route('customer.register') }}" 
+               class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-gradient-to-r from-emerald-600 via-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                </svg>
                 Sign Up Free
-            </a>            </div>
+            </a>
         </div>
     </div>
+</div>
 </header>
 
 <!-- Header for scrolling (original style) -->

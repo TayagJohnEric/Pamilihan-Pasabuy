@@ -566,7 +566,7 @@ class VendorDashboardController extends Controller
                     'sales_count' => $product->sales_count,
                     'price' => $product->price,
                     'stock' => $product->quantity_in_stock,
-                    'image' => $product->product_image_url,
+                    'image' => $product->image_url,
                 ];
             });
     }

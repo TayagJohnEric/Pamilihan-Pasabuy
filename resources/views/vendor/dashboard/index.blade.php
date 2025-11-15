@@ -5,113 +5,119 @@
 @section('content')
 <div class="max-w-[90rem] mx-auto space-y-6">
     
-    <!-- Header Section with Shop Info and Order Acceptance Toggle -->
-    <div class="bg-white rounded-lg shadow p-6">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">{{ $dashboardStats['vendor_info']['shop_name'] }}</h1>
-                <p class="text-sm sm:text-base text-gray-600 mt-1">Welcome back, {{ $dashboardStats['vendor_info']['name'] }}!</p>
-                <div class="flex items-center space-x-4 mt-2">
-                    @if($dashboardStats['vendor_info']['stall_number'])
-                        <span class="text-sm text-gray-500">Stall: {{ $dashboardStats['vendor_info']['stall_number'] }}</span>
-                    @endif
-                    @if($dashboardStats['vendor_info']['market_section'])
-                        <span class="text-sm text-gray-500">{{ $dashboardStats['vendor_info']['market_section'] }}</span>
-                    @endif
-                    @if($dashboardStats['vendor_info']['business_hours'])
-                        <span class="text-sm text-gray-500">Hours: {{ $dashboardStats['vendor_info']['business_hours'] }}</span>
-                    @endif
-                </div>
+   <!-- Header Section with Shop Info (Toggle untouched) -->
+<div class="bg-white rounded-lg shadow p-4 sm:p-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">{{ $dashboardStats['vendor_info']['shop_name'] }}</h1>
+            <p class="text-xs sm:text-sm md:text-base text-gray-600 mt-1">Welcome back, {{ $dashboardStats['vendor_info']['name'] }}!</p>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-2 space-y-1 sm:space-y-0">
+                @if($dashboardStats['vendor_info']['stall_number'])
+                    <span class="text-xs sm:text-sm text-gray-500">Stall: {{ $dashboardStats['vendor_info']['stall_number'] }}</span>
+                @endif
+                @if($dashboardStats['vendor_info']['market_section'])
+                    <span class="text-xs sm:text-sm text-gray-500">{{ $dashboardStats['vendor_info']['market_section'] }}</span>
+                @endif
+                @if($dashboardStats['vendor_info']['business_hours'])
+                    <span class="text-xs sm:text-sm text-gray-500">Hours: {{ $dashboardStats['vendor_info']['business_hours'] }}</span>
+                @endif
             </div>
-            <div class="mt-4 md:mt-0 flex items-center space-x-4">
-                <!-- Order Acceptance Toggle -->
-                <div class="flex items-center space-x-3">
-                    <span class="text-sm font-medium text-gray-700">Accepting Orders:</span>
-                    <button 
-                        id="order-acceptance-toggle" 
-                        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 {{ $dashboardStats['vendor_info']['is_accepting_orders'] ? 'bg-emerald-500' : 'bg-gray-300' }}"
-                        data-accepting="{{ $dashboardStats['vendor_info']['is_accepting_orders'] ? 'true' : 'false' }}"
-                    >
-                        <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {{ $dashboardStats['vendor_info']['is_accepting_orders'] ? 'translate-x-6' : 'translate-x-1' }}"></span>
-                    </button>
-                </div>
-                
-                <!-- Status Badge -->
-                <div class="flex items-center space-x-2">
-                    <div class="h-3 w-3 rounded-full {{ $dashboardStats['vendor_info']['is_accepting_orders'] ? 'bg-emerald-400' : 'bg-gray-400' }}"></div>
-                    <span class="text-sm font-medium {{ $dashboardStats['vendor_info']['is_accepting_orders'] ? 'text-emerald-600' : 'text-gray-600' }}">
-                        {{ $dashboardStats['vendor_info']['is_accepting_orders'] ? 'Open' : 'Closed' }}
-                    </span>
-                </div>
+        </div>
 
-                
+        <div class="mt-3 md:mt-0 flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
+            <!-- Order Acceptance Toggle (unchanged) -->
+            <div class="flex items-center space-x-3">
+                <span class="text-sm font-medium text-gray-700">Accepting Orders:</span>
+                <button 
+                    id="order-acceptance-toggle" 
+                    class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 {{ $dashboardStats['vendor_info']['is_accepting_orders'] ? 'bg-emerald-500' : 'bg-gray-300' }}"
+                    data-accepting="{{ $dashboardStats['vendor_info']['is_accepting_orders'] ? 'true' : 'false' }}"
+                >
+                    <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {{ $dashboardStats['vendor_info']['is_accepting_orders'] ? 'translate-x-6' : 'translate-x-1' }}"></span>
+                </button>
+            </div>
+            
+            <!-- Status Badge -->
+            <div class="flex items-center space-x-2">
+                <div id="status-dot" class="h-2 w-2 sm:h-3 sm:w-3 rounded-full {{ $dashboardStats['vendor_info']['is_accepting_orders'] ? 'bg-emerald-400' : 'bg-gray-400' }}"></div>
+                <span id="status-text" class="text-xs sm:text-sm font-medium {{ $dashboardStats['vendor_info']['is_accepting_orders'] ? 'text-emerald-600' : 'text-gray-600' }}">
+                    {{ $dashboardStats['vendor_info']['is_accepting_orders'] ? 'Open' : 'Closed' }}
+                </span>
             </div>
         </div>
     </div>
+</div>
+
 
     <!-- Key Statistics Cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         
-        <!-- Pending Orders Card -->
-        <div class="bg-white rounded-lg shadow p-4 sm:p-6">
-            <div class="flex items-center">
-                <div class="p-2 sm:p-3 rounded-full bg-orange-100">
-                    <svg class="h-5 w-5 sm:h-6 sm:w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <div class="ml-3 sm:ml-4">
-                    <p class="text-xs sm:text-sm font-medium text-gray-600">Pending Orders</p>
-                    <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $dashboardStats['today_stats']['pending_orders'] }}</p>
-                </div>
-            </div>
+       <!-- Pending Orders Card -->
+<div class="bg-white rounded-lg shadow p-3 sm:p-6">
+    <div class="flex items-center">
+        <div class="p-2 sm:p-3 rounded-full bg-orange-100">
+            <svg class="h-4 w-4 sm:h-6 sm:w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
         </div>
+        <div class="ml-2 sm:ml-4">
+            <p class="text-xs sm:text-sm font-medium text-gray-600">Pending Orders</p>
+            <p class="text-lg sm:text-2xl font-bold text-gray-900">{{ $dashboardStats['today_stats']['pending_orders'] }}</p>
+        </div>
+    </div>
+</div>
 
-        <!-- Sales Today Card -->
-        <div class="bg-white rounded-lg shadow p-4 sm:p-6">
-            <div class="flex items-center">
-                <div class="p-2 sm:p-3 rounded-full bg-green-100">
-                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 sm:h-6 sm:w-6 text-green-600 lucide lucide-philippine-peso-icon lucide-philippine-peso"><path d="M20 11H4"/><path d="M20 7H4"/><path d="M7 21V4a1 1 0 0 1 1-1h4a1 1 0 0 1 0 12H7"/></svg>
-                </div>
-                <div class="ml-3 sm:ml-4">
-                    <p class="text-xs sm:text-sm font-medium text-gray-600">Sales Today</p>
-                    <p class="text-xl sm:text-2xl font-bold text-gray-900">₱{{ number_format($dashboardStats['today_stats']['sales_amount'], 2) }}</p>
-                </div>
-            </div>
+<!-- Sales Today Card -->
+<div class="bg-white rounded-lg shadow p-3 sm:p-6">
+    <div class="flex items-center">
+        <div class="p-2 sm:p-3 rounded-full bg-green-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M20 11H4"/>
+                <path d="M20 7H4"/>
+                <path d="M7 21V4a1 1 0 0 1 1-1h4a1 1 0 0 1 0 12H7"/>
+            </svg>
         </div>
+        <div class="ml-2 sm:ml-4">
+            <p class="text-xs sm:text-sm font-medium text-gray-600">Sales Today</p>
+            <p class="text-lg sm:text-2xl font-bold text-gray-900">₱{{ number_format($dashboardStats['today_stats']['sales_amount'], 2) }}</p>
+        </div>
+    </div>
+</div>
 
-        <!-- Shop Rating Card -->
-        <div class="bg-white rounded-lg shadow p-4 sm:p-6">
-            <div class="flex items-center">
-                <div class="p-2 sm:p-3 rounded-full bg-yellow-100">
-                    <svg class="h-5 w-5 sm:h-6 sm:w-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                    </svg>
-                </div>
-                <div class="ml-3 sm:ml-4">
-                    <p class="text-xs sm:text-sm font-medium text-gray-600">Shop Rating</p>
-                    <p class="text-xl sm:text-2xl font-bold text-gray-900">
-                        {{ number_format($dashboardStats['vendor_info']['rating'], 1) }}
-                        <span class="text-xs sm:text-sm text-gray-500">/5.0</span>
-                    </p>
-                </div>
-            </div>
+<!-- Shop Rating Card -->
+<div class="bg-white rounded-lg shadow p-3 sm:p-6">
+    <div class="flex items-center">
+        <div class="p-2 sm:p-3 rounded-full bg-yellow-100">
+            <svg class="h-4 w-4 sm:h-6 sm:w-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+            </svg>
         </div>
+        <div class="ml-2 sm:ml-4">
+            <p class="text-xs sm:text-sm font-medium text-gray-600">Shop Rating</p>
+            <p class="text-lg sm:text-2xl font-bold text-gray-900">
+                {{ number_format($dashboardStats['vendor_info']['rating'], 1) }}
+                <span class="text-xs sm:text-sm text-gray-500">/5.0</span>
+            </p>
+        </div>
+    </div>
+</div>
 
-        <!-- Total Products Card -->
-        <div class="bg-white rounded-lg shadow p-4 sm:p-6">
-            <div class="flex items-center">
-                <div class="p-2 sm:p-3 rounded-full bg-blue-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                    </svg>
-                </div>
-                <div class="ml-3 sm:ml-4">
-                    <p class="text-xs sm:text-sm font-medium text-gray-600">Total Products</p>
-                    <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $dashboardStats['product_stats']['total_products'] }}</p>
-                </div>
-            </div>
+<!-- Total Products Card -->
+<div class="bg-white rounded-lg shadow p-3 sm:p-6">
+    <div class="flex items-center">
+        <div class="p-2 sm:p-3 rounded-full bg-blue-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-6 sm:w-6 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
         </div>
+        <div class="ml-2 sm:ml-4">
+            <p class="text-xs sm:text-sm font-medium text-gray-600">Total Products</p>
+            <p class="text-lg sm:text-2xl font-bold text-gray-900">{{ $dashboardStats['product_stats']['total_products'] }}</p>
+        </div>
+    </div>
+</div>
+
     </div>
 
     <!-- Business Overview -->
@@ -198,7 +204,7 @@
                 <p class="text-xs sm:text-sm text-gray-600">Total Products</p>
             </div>
             <div class="text-center">
-                <div class="text-xl sm:text-2xl font-bold text-green-600">{{ $dashboardStats['product_stats']['active_products'] }}</div>
+                <div class="text-xl sm:text-2xl font-bold text-emerald-600">{{ $dashboardStats['product_stats']['active_products'] }}</div>
                 <p class="text-xs sm:text-sm text-gray-600">Active Products</p>
             </div>
             <div class="text-center">
@@ -211,9 +217,11 @@
             </div>
         </div>
         <div class="mt-3 sm:mt-4 text-center">
-            <a href="{{ route('vendor.products.index') }}" class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 transition-colors">
-                Manage Inventory
-            </a>
+          <a href="{{ route('vendor.products.index') }}" 
+   class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md text-emerald-700 bg-emerald-100 hover:bg-emerald-200 transition-colors">
+    Manage Inventory
+</a>
+
         </div>
     </div>
 
@@ -224,7 +232,14 @@
         <div class="bg-white rounded-lg shadow p-4 sm:p-6">
             <div class="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 class="text-base sm:text-lg font-semibold text-gray-800">Pending Orders</h3>
-                <a href="{{ route('vendor.orders.index') }}" class="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium">View All</a>
+                <a href="{{ route('vendor.orders.index') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium">
+    View All
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5 ml-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <path d="M5 12h14"/>
+        <path d="m12 5 7 7-7 7"/>
+    </svg>
+</a>
+
             </div>
             
             @if($dashboardStats['pending_orders']->count() > 0)
@@ -281,7 +296,16 @@
         <div class="bg-white rounded-lg shadow p-4 sm:p-6">
             <div class="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 class="text-base sm:text-lg font-semibold text-gray-800">Top Products</h3>
-                <a href="{{ route('vendor.products.index') }}" class="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium">Manage Products</a>
+                <!-- Manage Products Link -->
+<a href="{{ route('vendor.products.index') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium">
+    Manage Products
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5 ml-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <path d="M5 12h14"/>
+        <path d="m12 5 7 7-7 7"/>
+    </svg>
+</a>
+
+                </a>
             </div>
             
             @if($dashboardStats['top_products']->count() > 0)
@@ -291,8 +315,8 @@
                             <!-- Product Image -->
                             <div class="flex-shrink-0">
                                 @if($product['image'])
-                                    <img src="{{ asset('storage/' . $product['image']) }}" 
-                                         alt="{{ $product['name'] }}" 
+                                    <img src="{{ asset('storage/' . $product['image']) }}"
+                                         alt="{{ $product['name'] }}"
                                          class="w-10 h-10 sm:w-12 sm:h-12 rounded object-cover">
                                 @else
                                     <div class="w-10 h-10 sm:w-12 sm:h-12 rounded bg-gray-200 flex items-center justify-center">
@@ -376,8 +400,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 // Update status indicator
-                const statusDot = document.querySelector('.h-3.w-3.rounded-full');
-                const statusText = statusDot.nextElementSibling;
+                const statusDot = document.getElementById('status-dot');
+                const statusText = document.getElementById('status-text');
+                
+                if (!statusDot || !statusText) {
+                    console.error('Status elements not found');
+                    return;
+                }
                 
                 if (newStatus) {
                     statusDot.classList.remove('bg-gray-400');
