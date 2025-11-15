@@ -230,7 +230,7 @@
 
             <!-- Text -->
             <div class="text-left">
-                <span class="text-xl sm:text-2xl font-bold text-gray-900 block">PamilihanPasabuy</span>
+                <span class="text-xl sm:text-2xl font-bold text-gray-900 block">PasaBuy</span>
                 <div class="text-xs text-gray-700 leading-none">San Fernando Market</div>
             </div>
         </div>

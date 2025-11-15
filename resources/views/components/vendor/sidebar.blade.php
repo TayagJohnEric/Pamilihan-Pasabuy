@@ -7,7 +7,7 @@
                 <img src="{{ asset('images/logo.png') }}" alt="San Fernando Market Logo" class="w-full h-full object-cover" />
             </div>
             <div>
-                <span class="text-lg font-bold text-gray-800">PamilihanPasabuy</span>
+                <span class="text-lg font-bold text-gray-800">PasaBuy</span>
                 <div class="text-xs text-gray-500 leading-none">San Fernando Market</div>
             </div>
         </div>

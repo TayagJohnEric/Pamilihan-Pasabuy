@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PamilihanPasabuy - Your San Fernando Market, Delivered Fresh</title>
+    <title>PasaBuy - Your San Fernando Market, Delivered Fresh</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
@@ -404,7 +404,7 @@
                 </div>
             </a>
             <div>
-                <span class="text-2xl font-bold text-white">PamilihanPasabuy</span>
+                <span class="text-2xl font-bold text-white">PasaBuy</span>
                 <div class="text-xs text-white leading-none">San Fernando Market</div>
             </div>
         </div>
@@ -463,7 +463,7 @@
             <img src="{{ asset('images/logo.png') }}" alt="San Fernando Market Logo" class="w-full h-full object-cover" />
         </div>
         <div>
-            <span class="text-2xl font-bold text-gray-800">PamilihanPasabuy</span>
+            <span class="text-2xl font-bold text-gray-800">PasaBuy</span>
             <div class="text-xs text-gray-500 leading-none">San Fernando Market</div>
     </div>
 </div>
@@ -904,7 +904,7 @@
                         </div>
                         <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">Connecting Community Through Fresh Food</h2>
                         <p class="text-md text-gray-600 mb-8 leading-relaxed">
-                            Born from a deep love for San Fernando's rich market tradition, PamilihanPasabuy bridges the gap between time-honored vendors and modern convenience. We believe that fresh, quality food should be accessible to everyone, while preserving the livelihoods of our local market heroes.
+                            Born from a deep love for San Fernando's rich market tradition, PasaBuy bridges the gap between time-honored vendors and modern convenience. We believe that fresh, quality food should be accessible to everyone, while preserving the livelihoods of our local market heroes.
                         </p>
                         <div class="space-y-4 mb-8">
                             <div class="flex items-center space-x-3">
@@ -1063,7 +1063,7 @@
                                 <img src="{{ asset('images/logo.png') }}" alt="San Fernando Market Logo" class="w-full h-full object-cover" />
                             </div>
                         <div>
-                            <span class="text-2xl font-bold">PamilihanPasabuy</span>
+                            <span class="text-2xl font-bold">PasaBuy</span>
                             <div class="text-xs text-gray-400">San Fernando Market</div>
                         </div>
                     </div>
@@ -1141,7 +1141,7 @@
             <div class="border-t border-gray-800 pt-8">
                 <div class="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
                     <div class="text-gray-400 text-center lg:text-left">
-                        <p>&copy; 2024 PamilihanPasabuy. All rights reserved.</p>
+                        <p>&copy; 2024 PasaBuy. All rights reserved.</p>
                     </div>
                     <div class="flex flex-wrap justify-center lg:justify-end space-x-6 text-sm">
                         <a href="#" class="text-gray-400 hover:text-emerald-400 transition-colors">Privacy Policy</a>

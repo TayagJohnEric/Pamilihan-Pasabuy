@@ -124,7 +124,7 @@ class SystemSettingsSeeder extends Seeder
             ],
             [
                 'setting_key' => 'app_maintenance_mode_message',
-                'setting_value' => 'PamilihanPasabuy is currently down for scheduled maintenance. We will be back shortly!',
+                'setting_value' => 'PasaBuy is currently down for scheduled maintenance. We will be back shortly!',
                 'description' => 'The message to display when the app is in maintenance mode.',
                 'created_at' => now(),
                 'updated_at' => now(),
