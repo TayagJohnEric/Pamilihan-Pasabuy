@@ -107,21 +107,7 @@
 </div>
 
 
-    <!-- Categories -->
-    @if($categories->count() > 0)
-        <div class="animate-slide-in mb-7">
-             <h3 class="text-lg font-semibold text-gray-800 mb-4">Browse by Category:</h3>
-            <div class="relative">
-                <div id="category-carousel" class="category-carousel flex gap-3 overflow-x-auto pb-2">
-                    @foreach($categories->take(12) as $category)
-                        <a href="{{ route('products.category', $category->id) }}" class="flex-none px-4 py-2 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-600 rounded-full hover:bg-emerald-100 hover:text-emerald-700 transition-all duration-200 text-sm font-medium whitespace-nowrap">
-                            {{ $category->category_name }}
-                        </a>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-    @endif
+    
 
 <!--Vendors-->
 @if($vendors->count() > 0)
@@ -245,11 +231,11 @@
                                 </div>
 
                                 <!-- Description -->
-                                @if($vendor->description)
-                                    <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 line-clamp-2 leading-relaxed">
-                                        {{ $vendor->description }}
-                                    </p>
-                                @endif
+                              @if($vendor->description)
+                                <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 leading-relaxed">
+                                    {{ Str::limit($vendor->description, 30) }}
+                                </p>
+                            @endif
 
                                 <!-- Footer -->
                                 <div class="flex items-center justify-between pt-2 border-t border-gray-100">
@@ -341,7 +327,7 @@
     @endif
 
 
-    <!-- Featured Products -->
+    <!-- Budget Products -->
     @if($budgetProducts->count() > 0)
         <div class="animate-slide-in mb-7">
             <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
@@ -403,6 +389,74 @@
                 </div>
             </div>
         </div>
+    @endif
+
+    <!-- Products by Category -->
+    @if($categoryProducts->count() > 0)
+        @foreach($categoryProducts as $category)
+            @if($category->products->count() > 0)
+                <div class="animate-slide-in mb-7">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-emerald-600 mr-2 lucide lucide-grid-3x3-icon lucide-grid-3x3"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                        {{ $category->category_name }}
+                    </h3>
+
+                    <!-- Carousel Container with Scroll Hints -->
+                    <div class="relative group">
+                        <!-- Scroll Hint Gradients -->
+                        <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        
+                        <!-- Carousel -->
+                        <div id="category-{{ $category->id }}-carousel" class="featured-carousel overflow-x-auto pb-4 scroll-smooth">
+                            <div class="flex gap-4 px-1">
+                                @foreach($category->products->take(4) as $product)
+                                    <a href="{{ route('products.show', $product->id) }}" class="product-card w-48 bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:border-emerald-300 flex-shrink-0">
+                                        <div class="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+                                            @if($product->image_url)
+                                                <img src="{{ asset('storage/' . $product->image_url) }}" alt="{{ $product->product_name }}" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" loading="lazy">
+                                            @else
+                                                <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                                    <svg class="w-12 h-12 sm:w-16 sm:h-16" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                            @endif
+
+                                            @if($product->is_budget_based)
+                                                <span class="absolute top-2 left-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-lg">Budget</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="p-3 sm:p-4">
+                                            @if($product->category)
+                                                <span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-medium px-2 py-1 rounded-full mb-2">{{ $product->category->category_name }}</span>
+                                            @endif
+                                            <h3 class="font-semibold text-gray-900 mb-1 line-clamp-2 text-sm sm:text-base">{{ $product->product_name }}</h3>
+                                            <p class="text-xs sm:text-sm text-gray-600 mb-3">by <span class="text-emerald-600 font-medium">{{ $product->vendor->vendor_name }}</span></p>
+                                            <div class="flex items-center justify-between mb-3">
+                                                <div>
+                                                    <span class="text-lg font-bold text-emerald-600">₱{{ number_format($product->price, 2) }}</span>
+                                                    <span class="text-xs text-gray-500">/ {{ $product->unit }}</span>
+                                                </div>
+                                            </div>
+                                          @if($product->vendor->average_rating)
+                                            <div class="flex items-center text-sm text-gray-600">
+                                                <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                </svg>
+                                                {{ number_format($product->vendor->average_rating, 1) }}
+                                            </div>
+                                        @endif
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endforeach
     @endif
 </div>
 

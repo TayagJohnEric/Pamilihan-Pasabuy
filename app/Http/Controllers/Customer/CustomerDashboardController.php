@@ -84,7 +84,29 @@ class CustomerDashboardController extends Controller
         ->take(8)
         ->get();
 
-    return view('customer.home.home', compact('products', 'categories', 'featuredProducts', 'vendors', 'budgetProducts'));
+    // Get products grouped by category for homepage
+    $categoryProducts = Category::with(['products' => function ($query) {
+            $query->where('is_available', true)
+                  ->whereHas('vendor', function (Builder $vendorQuery) {
+                      $vendorQuery->where('is_active', true)
+                                ->where('is_accepting_orders', true);
+                  })
+                  ->with(['vendor.user', 'category'])
+                  ->latest()
+                  ->take(4); // Limit to 4 products per category
+        }])
+        ->whereHas('products', function ($query) {
+            $query->where('is_available', true)
+                  ->whereHas('vendor', function (Builder $vendorQuery) {
+                      $vendorQuery->where('is_active', true)
+                                ->where('is_accepting_orders', true);
+                  });
+        })
+        ->orderBy('category_name')
+        ->take(6) // Limit to 6 categories
+        ->get();
+
+    return view('customer.home.home', compact('products', 'categories', 'featuredProducts', 'vendors', 'budgetProducts', 'categoryProducts'));
 }
 
 

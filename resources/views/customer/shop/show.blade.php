@@ -425,39 +425,40 @@
 </div>
 
     {{-- Customer Reviews Section --}}
-    @if($product->vendor && $product->vendor->ratingsReceived && $product->vendor->ratingsReceived->count() > 0)
-        <div class="bg-white rounded-xl shadow mt-8 p-6 border border-gray-100">
-            <h3 class="text-xl font-bold text-gray-900 mb-6">
-                Customer Reviews for {{ $product->vendor->vendor_name }}
-            </h3>
-            <div class="space-y-4">
-                @foreach($product->vendor->ratingsReceived as $rating)
-                    <div class="border-b border-gray-200 pb-4 last:border-b-0">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center">
-                                {{-- Star Rating Display --}}
-                                <div class="flex items-center" aria-label="Rating: {{ $rating->rating_value }} out of 5 stars">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <svg class="w-4 h-4 {{ $i <= $rating->rating_value ? 'text-yellow-400' : 'text-gray-300' }}" 
-                                             fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                    @endfor
-                                </div>
-                                <span class="ml-2 font-medium">
-                                    {{ $rating->user ? $rating->user->first_name . ' ' . $rating->user->last_name : 'Anonymous' }}
-                                </span>
+@if($product->vendor && $product->vendor->ratingsReceived && $product->vendor->ratingsReceived->count() > 0)
+    <div class="bg-white rounded-xl shadow mt-6 p-4 border border-gray-100">
+        <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
+            Customer Reviews for {{ $product->vendor->vendor_name }}
+        </h3>
+        <div class="space-y-3">
+            @foreach($product->vendor->ratingsReceived as $rating)
+                <div class="border-b border-gray-200 pb-3 last:border-b-0">
+                    <div class="flex items-center justify-between mb-1">
+                        <div class="flex items-center">
+                            {{-- Star Rating Display --}}
+                            <div class="flex items-center" aria-label="Rating: {{ $rating->rating_value }} out of 5 stars">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <svg class="w-3 h-3 sm:w-4 sm:h-4 {{ $i <= $rating->rating_value ? 'text-yellow-400' : 'text-gray-300' }}" 
+                                         fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                @endfor
                             </div>
-                            <span class="text-sm text-gray-500">{{ $rating->created_at->diffForHumans() }}</span>
+                            <span class="ml-2 text-sm sm:text-base font-medium">
+                                {{ $rating->user ? $rating->user->first_name . ' ' . $rating->user->last_name : 'Anonymous' }}
+                            </span>
                         </div>
-                        @if($rating->comment)
-                            <p class="text-gray-700">{{ $rating->comment }}</p>
-                        @endif
+                        <span class="text-xs sm:text-sm text-gray-500">{{ $rating->created_at->diffForHumans() }}</span>
                     </div>
-                @endforeach
-            </div>
+                    @if($rating->comment)
+                        <p class="text-gray-700 text-sm sm:text-base leading-snug">{{ $rating->comment }}</p>
+                    @endif
+                </div>
+            @endforeach
         </div>
-    @endif
+    </div>
+@endif
+
 
     {{-- Related Products from Same Vendor --}}
     @if($relatedProducts->count() > 0)
