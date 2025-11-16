@@ -115,6 +115,8 @@ class VendorOrderController extends Controller
         $order->load([
             'customer',
             'deliveryAddress.district',
+            'rider',
+            'rider.rider',
             'orderItems' => function($query) use ($vendor) {
                 $query->whereHas('product', function($q) use ($vendor) {
                     $q->where('vendor_id', $vendor->id);

@@ -44,7 +44,7 @@
                             <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Your Items to Fulfill</h2>
                             <div class="flex flex-col sm:flex-row sm:items-center gap-3">
                                 <button type="button" id="bulk-ready-btn" 
-                                        class="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg sm:rounded-xl transition-colors shadow-sm hover:shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
+                                        class="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg sm:rounded-xl transition-colors shadow-sm hover:shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
                                         disabled>
                                     <span class="btn-loading hidden">
                                         <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -58,7 +58,7 @@
                                     <span class="btn-text">Mark Selected as Ready</span>
                                 </button>
                                 <div class="inline-flex items-center justify-center px-3 py-2 bg-emerald-100 text-emerald-800 text-sm font-medium rounded-full">
-                                    <span id="selected-count">0</span> <span>selected</span>
+                                    <span id="selected-count">0</span>
                                 </div>
                             </div>
                         </div>
@@ -96,7 +96,7 @@
                                             <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3 break-words">{{ $item->product_name_snapshot }}</h3>
                                             <div class="flex flex-col gap-2 text-xs sm:text-sm">
                                                 <div class="flex items-center">
-                                                    <svg class="w-4 h-4 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg class="w-4 h-4 text-emerald-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                                                     </svg>
                                                     <span class="text-gray-600">
@@ -105,18 +105,14 @@
                                                 </div>
                                                 @if($item->customer_budget_requested)
                                                     <div class="flex items-center">
-                                                        <svg class="w-4 h-4 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                                                        </svg>
+                                                       
                                                         <span class="text-gray-600">
                                                             <span class="font-medium">Budget:</span> ₱{{ number_format($item->customer_budget_requested, 2) }}
                                                         </span>
                                                     </div>
                                                 @else
                                                     <div class="flex items-center">
-                                                        <svg class="w-4 h-4 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                                                        </svg>
+                                                       
                                                         <span class="text-gray-600">
                                                             <span class="font-medium">Unit Price:</span> ₱{{ number_format($item->unit_price_snapshot, 2) }}
                                                         </span>
@@ -270,105 +266,177 @@
             </div>
 
             <!-- Order Information Sidebar -->
-            <div class="hidden lg:block lg:col-span-1 order-1 lg:order-2 space-y-4 sm:space-y-6">
-                <!-- Customer Information -->
-                <div class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
-                    <div class="flex items-center mb-3 sm:mb-4">
-                        <svg class="w-5 h-5 text-green-500 mr-2 sm:mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                        <h3 class="text-base sm:text-lg font-semibold text-gray-900">Customer Information</h3>
-                    </div>
-                    <div class="space-y-3 sm:space-y-4">
-                        <div>
-                            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Name</p>
-                            <p class="text-sm sm:text-base text-gray-900 font-medium break-words">{{ $order->customer->first_name }} {{ $order->customer->last_name }}</p>
+            <div class="lg:block lg:col-span-1 order-1 lg:order-2 space-y-4 sm:space-y-6">
+                @if($order->rider)
+                    <div class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+                        <div class="flex items-center mb-3 sm:mb-4">
+                            <svg class="w-5 h-5 text-green-500 mr-2 sm:mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 014-4h4.586a1 1 0 00.707-.293l1.414-1.414A2 2 0 0018.586 8H17"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                            </svg>
+                            <h3 class="text-base sm:text-lg font-semibold text-gray-900">Assigned Rider</h3>
                         </div>
-                        <div>
-                            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Email</p>
-                            <p class="text-sm sm:text-base text-gray-900 break-all">{{ $order->customer->email }}</p>
-                        </div>
-                        @if($order->customer->phone_number)
-                            <div>
-                                <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Phone</p>
-                                <p class="text-sm sm:text-base text-gray-900">{{ $order->customer->phone_number }}</p>
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0">
+                                @if($order->rider->profile_image_url)
+                                    <img src="{{ asset('storage/' . $order->rider->profile_image_url) }}" alt="{{ $order->rider->first_name }}"
+                                         class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border border-gray-200">
+                                @else
+                                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+                                        <span class="text-gray-500 font-semibold text-lg">{{ strtoupper(substr($order->rider->first_name, 0, 1) . substr($order->rider->last_name, 0, 1)) }}</span>
+                                    </div>
+                                @endif
                             </div>
-                        @endif
+                            <div class="flex-1 space-y-2">
+                                <div>
+                                    <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Name</p>
+                                    <p class="text-sm sm:text-base text-gray-900 font-semibold">{{ $order->rider->first_name }} {{ $order->rider->last_name }}</p>
+                                </div>
+                                @if(optional($order->rider->rider)->license_number)
+                                    <div>
+                                        <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">License Number</p>
+                                        <p class="text-sm sm:text-base text-gray-900">{{ $order->rider->rider->license_number }}</p>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
                     </div>
-                </div>
+                @endif
+               <!-- Customer Information -->
+<div class="hidden sm:block bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+    <div class="flex items-center mb-3 sm:mb-4">
+        <svg class="w-5 h-5 text-green-500 mr-2 sm:mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+        </svg>
+        <h3 class="text-base sm:text-lg font-semibold text-gray-900">Customer Information</h3>
+    </div>
 
-                <!-- Delivery Information -->
-                <div class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
-                    <div class="flex items-center mb-3 sm:mb-4">
-                        <svg class="w-5 h-5 text-green-500 mr-2 sm:mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                        <h3 class="text-base sm:text-lg font-semibold text-gray-900">Delivery Information</h3>
-                    </div>
-                    <div class="space-y-3 sm:space-y-4">
-                        <div>
-                            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Address</p>
-                            <p class="text-sm sm:text-base text-gray-900 break-words">{{ $order->deliveryAddress->address_line1 }}</p>
-                        </div>
-                        <div>
-                            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">District</p>
-                            <p class="text-sm sm:text-base text-gray-900">{{ $order->deliveryAddress->district->name }}</p>
-                        </div>
-                        @if($order->deliveryAddress->delivery_notes)
-                            <div>
-                                <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Delivery Notes</p>
-                                <p class="text-sm sm:text-base text-gray-900 break-words">{{ $order->deliveryAddress->delivery_notes }}</p>
-                            </div>
-                        @endif
-                        <div>
-                            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Delivery Fee</p>
-                            <p class="text-sm sm:text-base font-semibold text-gray-900">₱{{ number_format($order->delivery_fee, 2) }}</p>
-                        </div>
-                    </div>
-                </div>
+    <div class="space-y-3 sm:space-y-4">
+        <div>
+            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Name</p>
+            <p class="text-sm sm:text-base text-gray-900 font-medium break-words">
+                {{ $order->customer->first_name }} {{ $order->customer->last_name }}
+            </p>
+        </div>
+
+        <div>
+            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Email</p>
+            <p class="text-sm sm:text-base text-gray-900 break-all">
+                {{ $order->customer->email }}
+            </p>
+        </div>
+
+        @if($order->customer->phone_number)
+        <div>
+            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Phone</p>
+            <p class="text-sm sm:text-base text-gray-900">
+                {{ $order->customer->phone_number }}
+            </p>
+        </div>
+        @endif
+    </div>
+</div>
+
+
+              <!-- Delivery Information -->
+<div class="hidden sm:block bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+    <div class="flex items-center mb-3 sm:mb-4">
+        <svg class="w-5 h-5 text-green-500 mr-2 sm:mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+        <h3 class="text-base sm:text-lg font-semibold text-gray-900">Delivery Information</h3>
+    </div>
+
+    <div class="space-y-3 sm:space-y-4">
+        <div>
+            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Address</p>
+            <p class="text-sm sm:text-base text-gray-900 break-words">
+                {{ $order->deliveryAddress->address_line1 }}
+            </p>
+        </div>
+
+        <div>
+            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">District</p>
+            <p class="text-sm sm:text-base text-gray-900">
+                {{ $order->deliveryAddress->district->name }}
+            </p>
+        </div>
+
+        @if($order->deliveryAddress->delivery_notes)
+        <div>
+            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Delivery Notes</p>
+            <p class="text-sm sm:text-base text-gray-900 break-words">
+                {{ $order->deliveryAddress->delivery_notes }}
+            </p>
+        </div>
+        @endif
+
+        <div>
+            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Delivery Fee</p>
+            <p class="text-sm sm:text-base font-semibold text-gray-900">
+                ₱{{ number_format($order->delivery_fee, 2) }}
+            </p>
+        </div>
+    </div>
+</div>
+
 
                 <!-- Order Summary -->
-                <div class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
-                    <div class="flex items-center mb-3 sm:mb-4">
-                        <svg class="w-5 h-5 text-green-500 mr-2 sm:mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        <h3 class="text-base sm:text-lg font-semibold text-gray-900">Order Summary</h3>
-                    </div>
-                    <div class="space-y-3 sm:space-y-4">
-                        <div>
-                            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Order Date</p>
-                            <p class="text-sm sm:text-base text-gray-900">{{ $order->created_at->format('M d, Y h:i A') }}</p>
-                        </div>
-                        <div>
-                            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Payment Method</p>
-                            <p class="text-sm sm:text-base text-gray-900">{{ $order->payment_method === 'cod' ? 'Cash on Delivery' : 'Online Payment' }}</p>
-                        </div>
-                        <div>
-                            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Payment Status</p>
-                            <span class="inline-flex items-center px-2.5 sm:px-3 py-1 text-xs font-medium rounded-full
-                                @if($order->payment_status === 'paid') bg-green-100 text-green-800
-                                @elseif($order->payment_status === 'pending') bg-amber-100 text-amber-800
-                                @else bg-red-100 text-red-800
-                                @endif">
-                                {{ ucfirst($order->payment_status) }}
-                            </span>
-                        </div>
-                        @if($order->special_instructions)
-                            <div>
-                                <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Special Instructions</p>
-                                <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                                    <p class="text-sm sm:text-base text-gray-900 break-words">{{ $order->special_instructions }}</p>
-                                </div>
-                            </div>
-                        @endif
-                        <div class="border-t border-gray-100 pt-3 sm:pt-4">
-                            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Total Amount</p>
-                            <p class="text-xl sm:text-2xl font-bold text-gray-900">₱{{ number_format($order->final_total_amount, 2) }}</p>
-                        </div>
-                    </div>
-                </div>
+<div class="hidden sm:block bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+    <div class="flex items-center mb-3 sm:mb-4">
+        <svg class="w-5 h-5 text-green-500 mr-2 sm:mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <h3 class="text-base sm:text-lg font-semibold text-gray-900">Order Summary</h3>
+    </div>
+
+    <div class="space-y-3 sm:space-y-4">
+        <div>
+            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Order Date</p>
+            <p class="text-sm sm:text-base text-gray-900">
+                {{ $order->created_at->format('M d, Y h:i A') }}
+            </p>
+        </div>
+
+        <div>
+            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Payment Method</p>
+            <p class="text-sm sm:text-base text-gray-900">
+                {{ $order->payment_method === 'cod' ? 'Cash on Delivery' : 'Online Payment' }}
+            </p>
+        </div>
+
+        <div>
+            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Payment Status</p>
+            <span class="inline-flex items-center px-2.5 sm:px-3 py-1 text-xs font-medium rounded-full
+                @if($order->payment_status === 'paid') bg-green-100 text-green-800
+                @elseif($order->payment_status === 'pending') bg-amber-100 text-amber-800
+                @else bg-red-100 text-red-800
+                @endif">
+                {{ ucfirst($order->payment_status) }}
+            </span>
+        </div>
+
+        @if($order->special_instructions)
+        <div>
+            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Special Instructions</p>
+            <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p class="text-sm sm:text-base text-gray-900 break-words">
+                    {{ $order->special_instructions }}
+                </p>
+            </div>
+        </div>
+        @endif
+
+        <div class="border-t border-gray-100 pt-3 sm:pt-4">
+            <p class="text-xs sm:text-sm font-medium text-gray-500 mb-1">Total Amount</p>
+            <p class="text-xl sm:text-2xl font-bold text-gray-900">
+                ₱{{ number_format($order->final_total_amount, 2) }}
+            </p>
+        </div>
+    </div>
+</div>
+
             </div>
         </div>
     </div>

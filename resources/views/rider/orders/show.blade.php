@@ -12,8 +12,8 @@
                     <div class="space-y-4 lg:space-y-0 lg:flex lg:items-start lg:justify-between lg:gap-6">
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center space-x-2 sm:space-x-3 mb-2">
-                                <div class="p-1.5 sm:p-2 bg-green-50 rounded-lg flex-shrink-0">
-                                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="p-1.5 sm:p-2 bg-emerald-50 rounded-lg flex-shrink-0">
+                                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                     </svg>
                                 </div>
@@ -30,13 +30,13 @@
                                     {{ $order->status === 'assigned' ? 'bg-blue-50 text-blue-700 border-blue-200' : '' }}
                                     {{ $order->status === 'pickup_confirmed' ? 'bg-purple-50 text-purple-700 border-purple-200' : '' }}
                                     {{ $order->status === 'out_for_delivery' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : '' }}
-                                    {{ $order->status === 'delivered' ? 'bg-green-50 text-green-700 border-green-200' : '' }}">
+                                    {{ $order->status === 'delivered' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : '' }}">
                                     <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full mr-1.5 sm:mr-2
                                         {{ $order->status === 'awaiting_rider_assignment' ? 'bg-amber-400' : '' }}
                                         {{ $order->status === 'assigned' ? 'bg-blue-400' : '' }}
                                         {{ $order->status === 'pickup_confirmed' ? 'bg-purple-400' : '' }}
                                         {{ $order->status === 'out_for_delivery' ? 'bg-indigo-400' : '' }}
-                                        {{ $order->status === 'delivered' ? 'bg-green-400' : '' }}"></div>
+                                        {{ $order->status === 'delivered' ? 'bg-emerald-400' : '' }}"></div>
                                     <span class="whitespace-nowrap">{{ strtoupper(str_replace('_', ' ', $order->status)) }}</span>
                                 </span>
                             </div>
@@ -45,7 +45,7 @@
                             <div class="flex gap-2 sm:gap-3 w-auto lg:w-full">
                                 @if($order->status === 'awaiting_rider_assignment')
                                     <button id="accept-order-btn" 
-                                            class="relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 bg-green-600 text-white rounded-lg sm:rounded-xl hover:bg-green-700 font-semibold text-sm transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex-1 sm:flex-none"
+                                            class="relative inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 bg-emerald-600 text-white rounded-lg sm:rounded-xl hover:bg-emerald-700 font-semibold text-sm transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex-1 sm:flex-none"
                                             data-order-id="{{ $order->id }}">
                                         <span class="button-text">Accept</span>
                                         <div class="button-loading hidden flex items-center justify-center">
@@ -139,7 +139,7 @@
                                                accept="image/*" 
                                                capture="environment"
                                                required
-                                               class="block w-full text-xs sm:text-sm text-gray-500 file:mr-3 file:py-2 file:px-3 sm:file:px-4 file:rounded-lg file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                               class="block w-full text-xs sm:text-sm text-gray-500 file:mr-3 file:py-2 file:px-3 sm:file:px-4 file:rounded-lg file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                                         <p class="mt-1 text-xs text-gray-500">JPG, PNG, GIF (Max: 5MB)</p>
                                     </div>
                                     
@@ -183,8 +183,8 @@
                     <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
                         <div class="px-4 sm:px-6 py-4 sm:py-6 border-b border-gray-100">
                             <h3 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center">
-                                <div class="p-1.5 sm:p-2 bg-green-50 rounded-lg mr-2 sm:mr-3 flex-shrink-0">
-                                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="p-1.5 sm:p-2 bg-emerald-50 rounded-lg mr-2 sm:mr-3 flex-shrink-0">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                     </svg>
                                 </div>
@@ -197,12 +197,12 @@
                                     <div class="flex items-center space-x-3 sm:space-x-4">
                                         <div class="flex-shrink-0">
                                             @if($order->customer->profile_image_url)
-                                                <img class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-green-100" 
+                                                <img class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-emerald-100" 
                                                      src="{{asset('storage/' . $order->customer->profile_image_url)}}" 
                                                      alt="{{ $order->customer->first_name }} {{ $order->customer->last_name }}">
                                             @else
-                                                <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-green-100 flex items-center justify-center border-2 border-green-200">
-                                                    <span class="text-green-600 font-semibold text-base sm:text-xl">
+                                                <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-emerald-100 flex items-center justify-center border-2 border-emerald-200">
+                                                    <span class="text-emerald-600 font-semibold text-base sm:text-xl">
                                                         {{ substr($order->customer->first_name, 0, 1) }}{{ substr($order->customer->last_name, 0, 1) }}
                                                     </span>
                                                 </div>
@@ -224,7 +224,7 @@
                                                 </svg>
                                             </div>
                                             <a href="tel:{{ $order->customer->phone_number }}" 
-                                               class="text-green-600 hover:text-green-700 font-medium text-sm transition-colors duration-200 truncate">
+                                               class="text-emerald-600 hover:text-emerald-700 font-medium text-sm transition-colors duration-200 truncate">
                                                 {{ $order->customer->phone_number }}
                                             </a>
                                         </div>
@@ -233,8 +233,8 @@
                                 
                                 <div>
                                     <h4 class="font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center text-sm sm:text-base">
-                                        <div class="p-1 bg-green-50 rounded mr-2 flex-shrink-0">
-                                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="p-1 bg-emerald-50 rounded mr-2 flex-shrink-0">
+                                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             </svg>
@@ -270,8 +270,8 @@
                     <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
                         <div class="px-4 sm:px-6 py-4 sm:py-6 border-b border-gray-100">
                             <h3 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center">
-                                <div class="p-1.5 sm:p-2 bg-green-50 rounded-lg mr-2 sm:mr-3 flex-shrink-0">
-                                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="p-1.5 sm:p-2 bg-emerald-50 rounded-lg mr-2 sm:mr-3 flex-shrink-0">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h1a1 1 0 011 1v5m-4 0h4"></path>
                                     </svg>
                                 </div>
@@ -292,8 +292,8 @@
                                                                  src="{{asset('storage/' . $vendor->shop_logo_url)}}" 
                                                                  alt="{{ $vendor->vendor_name }}">
                                                         @else
-                                                            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-green-100 flex items-center justify-center border border-green-200">
-                                                                <span class="text-green-600 font-semibold text-base sm:text-lg">
+                                                            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-emerald-100 flex items-center justify-center border border-emerald-200">
+                                                                <span class="text-emerald-600 font-semibold text-base sm:text-lg">
                                                                     {{ substr($vendor->vendor_name, 0, 1) }}
                                                                 </span>
                                                             </div>
@@ -318,7 +318,7 @@
                                                         </div>
                                                         @if($vendor->public_contact_number)
                                                             <a href="tel:{{ $vendor->public_contact_number }}" 
-                                                               class="inline-flex items-center text-green-600 hover:text-green-700 text-xs sm:text-sm font-medium mt-1 sm:mt-2 transition-colors duration-200">
+                                                               class="inline-flex items-center text-emerald-600 hover:text-emerald-700 text-xs sm:text-sm font-medium mt-1 sm:mt-2 transition-colors duration-200">
                                                                 <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                                                                 </svg>
@@ -328,7 +328,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="flex-shrink-0">
-                                                    <span class="inline-flex items-center px-2 sm:px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap">
+                                                    <span class="inline-flex items-center px-2 sm:px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap">
                                                         {{ $items->count() }} item{{ $items->count() > 1 ? 's' : '' }}
                                                     </span>
                                                 </div>
@@ -365,7 +365,7 @@
                                                             <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold whitespace-nowrap
                                                                 {{ $item->status === 'pending' ? 'bg-amber-100 text-amber-700' : '' }}
                                                                 {{ $item->status === 'preparing' ? 'bg-blue-100 text-blue-700' : '' }}
-                                                                {{ $item->status === 'ready_for_pickup' ? 'bg-green-100 text-green-700' : '' }}">
+                                                                {{ $item->status === 'ready_for_pickup' ? 'bg-emerald-100 text-emerald-700' : '' }}">
                                                                 {{ strtoupper(str_replace('_', ' ', $item->status)) }}
                                                             </span>
                                                         </div>
@@ -473,7 +473,7 @@
                                     <div class="flex items-center space-x-2">
                                         <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold whitespace-nowrap
                                             {{ $order->payment_status === 'pending' ? 'bg-amber-100 text-amber-700' : '' }}
-                                            {{ $order->payment_status === 'paid' ? 'bg-green-100 text-green-700' : '' }}
+                                            {{ $order->payment_status === 'paid' ? 'bg-emerald-100 text-emerald-700' : '' }}
                                             {{ $order->payment_status === 'failed' ? 'bg-red-100 text-red-700' : '' }}">
                                             {{ strtoupper($order->payment_status) }}
                                         </span>
@@ -494,7 +494,7 @@
                                     </div>
                                     <div class="flex justify-between items-center py-2">
                                         <span class="text-gray-600 font-medium text-sm">Your Delivery Fee</span>
-                                        <span class="font-bold text-green-600 text-base sm:text-lg">₱{{ number_format($order->delivery_fee, 2) }}</span>
+                                        <span class="font-bold text-emerald-600 text-base sm:text-lg">₱{{ number_format($order->delivery_fee, 2) }}</span>
                                     </div>
                                 </div>
                                 
@@ -502,9 +502,7 @@
                                     <div class="mt-3 sm:mt-4 p-3 sm:p-4 bg-orange-50 border border-orange-200 rounded-lg sm:rounded-xl">
                                         <div class="flex items-start space-x-2 sm:space-x-3">
                                             <div class="p-1 bg-orange-100 rounded flex-shrink-0">
-                                                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                                                </svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-600 lucide lucide-philippine-peso-icon lucide-philippine-peso"><path d="M20 11H4"/><path d="M20 7H4"/><path d="M7 21V4a1 1 0 0 1 1-1h4a1 1 0 0 1 0 12H7"/></svg>
                                             </div>
                                             <div class="flex-1 min-w-0">
                                                 <p class="font-semibold text-orange-800 text-xs sm:text-sm">Cash on Delivery</p>
@@ -535,7 +533,7 @@
                                 @foreach($order->statusHistory->sortByDesc('created_at') as $index => $history)
                                 <div class="flex space-x-3 sm:space-x-4">
                                     <div class="flex flex-col items-center flex-shrink-0">
-                                        <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 {{ $index === 0 ? 'bg-green-500' : 'bg-gray-400' }} rounded-full"></div>
+                                        <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 {{ $index === 0 ? 'bg-emerald-500' : 'bg-gray-400' }} rounded-full"></div>
                                         @if(!$loop->last)
                                             <div class="w-px h-6 sm:h-8 bg-gray-200 mt-2"></div>
                                         @endif
@@ -579,7 +577,7 @@
             function showToast(message, type = 'success') {
                 const toast = document.createElement('div');
                 toast.className = `flex items-center px-4 sm:px-6 py-3 sm:py-4 mb-2 text-xs sm:text-sm rounded-lg sm:rounded-xl shadow-lg transform transition-all duration-300 ease-in-out translate-x-full opacity-0 ${
-                    type === 'success' ? 'text-white bg-green-500' :
+                    type === 'success' ? 'text-white bg-emerald-500' :
                     type === 'error' ? 'text-white bg-red-500' :
                     'text-white bg-blue-500'
                 }`;
@@ -734,7 +732,7 @@
                         // Enable the submit button
                         deliveredBtn.disabled = false;
                         deliveredBtn.classList.remove('bg-gray-400', 'disabled:cursor-not-allowed');
-                        deliveredBtn.classList.add('bg-green-600', 'hover:bg-green-700', 'transform', 'hover:-translate-y-0.5');
+                        deliveredBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700', 'transform', 'hover:-translate-y-0.5');
                     }
                 });
 
@@ -745,7 +743,7 @@
                         imagePreview.classList.add('hidden');
                         deliveredBtn.disabled = true;
                         deliveredBtn.classList.add('bg-gray-400', 'disabled:cursor-not-allowed');
-                        deliveredBtn.classList.remove('bg-green-600', 'hover:bg-green-700', 'transform', 'hover:-translate-y-0.5');
+                        deliveredBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700', 'transform', 'hover:-translate-y-0.5');
                     });
                 }
 
