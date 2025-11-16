@@ -33,6 +33,9 @@
                                 @case('out_for_delivery')
                                     bg-purple-50 text-purple-700 border border-purple-200
                                     @break
+                                @case('pending_customer_confirmation')
+                                    bg-indigo-50 text-indigo-700 border border-indigo-200
+                                    @break
                                 @case('delivered')
                                     bg-emerald-50 text-emerald-700 border border-emerald-200
                                     @break
@@ -147,12 +150,62 @@
                         @endif
                     @endif
                     
+                    @if($order->status === 'pending_customer_confirmation')
+                        <div class="w-full p-4 bg-indigo-50 border border-indigo-200 rounded-xl mb-4">
+                            <div class="flex flex-col gap-3">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A2 2 0 0122 9.527V16a2 2 0 01-2 2h-4" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l-4.553 2.276A2 2 0 012 15.473V9a2 2 0 012-2h4" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10V5a3 3 0 013-3 3 3 0 013 3v5" />
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="text-sm font-semibold text-indigo-900">Awaiting Your Confirmation</h3>
+                                        <p class="text-sm text-indigo-800">Please review the delivery proof and confirm if you have received your order. The order will only be marked as delivered after your confirmation.</p>
+                                    </div>
+                                </div>
+
+                                @if($order->delivery_proof_image)
+                                    <div class="bg-white rounded-lg border border-indigo-100 p-3">
+                                        <p class="text-xs font-medium text-indigo-900 mb-2">Delivery Proof</p>
+                                        <div class="flex flex-col sm:flex-row gap-4">
+                                            <img src="{{ asset('storage/' . $order->delivery_proof_image) }}" alt="Delivery proof for order #{{ $order->id }}" class="w-full sm:w-40 h-40 object-cover rounded-lg border">
+                                            <div class="text-sm text-indigo-800">
+                                                <p class="mb-3">Make sure the items shown in the proof image were received.</p>
+                                                <a href="{{ asset('storage/' . $order->delivery_proof_image) }}" target="_blank" class="inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-700">
+                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A2 2 0 0122 9.527V16a2 2 0 01-2 2h-4" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l-4.553 2.276A2 2 0 012 15.473V9a2 2 0 012-2h4" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10V5a3 3 0 013-3 3 3 0 013 3v5" />
+                                                    </svg>
+                                                    View Full Image
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <form method="POST" action="{{ route('customer.orders.confirm-delivery', $order) }}" class="mt-2">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit"
+                                            class="w-full inline-flex items-center justify-center px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-semibold text-sm shadow-sm hover:bg-indigo-700 transition">
+                                        Confirm Delivery
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endif
+
                     @if($order->status === 'delivered')
                         @php
                             $hasRated = isset($order->ratings)
                                 ? $order->ratings->where('user_id', auth()->id())->isNotEmpty()
                                 : false;
                         @endphp
+                        
                         @if(!$hasRated)
                             <a href="{{ route('customer.orders.rate', $order) }}"
                                class="px-6 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors font-medium text-sm shadow-sm">
@@ -310,6 +363,9 @@
                                                 @case('out_for_delivery')
                                                     bg-purple-100 border-2 border-purple-200
                                                     @break
+                                                @case('pending_customer_confirmation')
+                                                    bg-indigo-100 border-2 border-indigo-200
+                                                    @break
                                                 @case('delivered')
                                                     bg-emerald-100 border-2 border-emerald-200
                                                     @break
@@ -325,11 +381,14 @@
                                                         bg-blue-500
                                                         @break
                                                     @case('out_for_delivery')
-                                                        bg-purple-500
-                                                        @break
-                                                    @case('delivered')
-                                                        bg-emerald-500
-                                                        @break
+                                                    bg-purple-500
+                                                    @break
+                                                @case('pending_customer_confirmation')
+                                                    bg-indigo-500
+                                                    @break
+                                                @case('delivered')
+                                                    bg-emerald-500
+                                                    @break
                                                     @case('cancelled')
                                                         bg-red-500
                                                         @break

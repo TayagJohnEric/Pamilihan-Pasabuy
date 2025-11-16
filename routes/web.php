@@ -184,6 +184,7 @@ Route::prefix('customer')->middleware(['auth'])->name('customer.')->group(functi
         Route::get('{order}', [CustomerOrderController::class, 'show'])->name('show');
         Route::get('{order}/rate', [CustomerRatingController::class, 'showRatingForm'])->name('rate');
         Route::post('{order}/rate', [CustomerRatingController::class, 'submitRating'])->name('rate.submit');
+        Route::patch('{order}/confirm-delivery', [CustomerOrderController::class, 'confirmDelivery'])->name('confirm-delivery');
     });
 });
 

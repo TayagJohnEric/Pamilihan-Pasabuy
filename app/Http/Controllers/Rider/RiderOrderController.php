@@ -585,8 +585,8 @@ class RiderOrderController extends Controller
                 Log::info("Delivery proof image uploaded for order {$order->id}: {$deliveryProofPath}");
             }
 
-            // Update order status to delivered and save delivery proof image path
-            $updateData = ['status' => 'delivered'];
+            // Update order status to pending customer confirmation and save delivery proof image path
+            $updateData = ['status' => 'pending_customer_confirmation'];
             if ($deliveryProofPath) {
                 $updateData['delivery_proof_image'] = $deliveryProofPath;
             }
@@ -610,27 +610,27 @@ class RiderOrderController extends Controller
             }
 
             // Log delivery completion with proof image info
-            $notes = 'Order successfully delivered to customer';
+            $notes = 'Rider submitted delivery proof and is awaiting customer confirmation';
             if ($deliveryProofPath) {
                 $notes .= ' with delivery proof image uploaded';
             }
             
             $this->logOrderStatusChange(
                 $order->id,
-                'delivered',
+                'pending_customer_confirmation',
                 $notes,
                 Auth::id()
             );
 
-            // Notify customer about successful delivery and prompt for rating
+            // Notify customer to confirm delivery
             $this->createNotification(
                 $order->customer_user_id,
-                'order_delivered',
-                'Order Delivered Successfully!',
+                'delivery_confirmation_required',
+                'Delivery Confirmation Needed',
                 [
                     'order_id' => $order->id,
                     'rider_name' => Auth::user()->first_name . ' ' . Auth::user()->last_name,
-                    'message' => 'Your order has been delivered! Please rate your experience.'
+                    'message' => 'Your rider uploaded a delivery proof. Please confirm the delivery to complete your order.'
                 ],
                 Order::class,
                 $order->id

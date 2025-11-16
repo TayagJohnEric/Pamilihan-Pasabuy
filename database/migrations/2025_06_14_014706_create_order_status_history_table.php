@@ -32,6 +32,7 @@ return new class extends Migration
                 'awaiting_rider_assignment',
                 'assigned',
                 'pickup_confirmed',
+                'pending_customer_confirmation',
                 'out_for_delivery',
                 'delivered',
                 'cancelled',
