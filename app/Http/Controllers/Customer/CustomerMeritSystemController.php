@@ -55,6 +55,7 @@ class CustomerMeritSystemController extends Controller
 
     /**
      * Get all riders with calculated merit scores, sorted by merit score descending
+     * Limited to top 10 riders for the leaderboard
      * 
      * @return \Illuminate\Support\Collection
      */
@@ -92,6 +93,7 @@ class CustomerMeritSystemController extends Controller
             ->groupBy('r.id', 'r.user_id', 'u.first_name', 'u.last_name', 'u.profile_image_url', 
                      'r.average_rating', 'r.total_deliveries', 'r.is_available', 'r.vehicle_type', 'r.verification_status')
             ->orderBy('merit_score', 'desc')  // Highest merit score first
+            ->limit(10)  // Limit to top 10 riders
             ->get();
     }
 
@@ -234,13 +236,14 @@ class CustomerMeritSystemController extends Controller
     /**
      * AJAX endpoint to refresh rider rankings
      * Used for real-time updates without page refresh
+     * Returns top 10 riders based on merit score
      * 
      * @return \Illuminate\Http\JsonResponse
      */
     public function refreshRankings()
     {
         try {
-            // Get updated riders with merit scores
+            // Get updated riders with merit scores (top 10)
             $riders = $this->getRidersWithMeritScore();
             
             // Identify top 3 riders as suggested

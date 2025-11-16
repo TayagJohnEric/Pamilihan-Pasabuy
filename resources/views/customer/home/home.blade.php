@@ -77,43 +77,29 @@
     }
 </style>
 
-<div class="max-w-[90rem] mx-auto px-3 sm:px-6 lg:px-8">
-    <!-- Hero Section with Background Image -->
-<div class="relative rounded-xl shadow-md mb-8 p-6 sm:p-8 text-white animate-slide-in bg-cover bg-center" 
-     style="background-image: url('{{ asset('images/bg-banner.png') }}');">
-    <div class="absolute inset-0 bg-emerald-700/60 rounded-xl"></div> <!-- Optional overlay for better text readability -->
-
-    <div class="relative max-w-4xl">
-        <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-1 leading-tight">
-            Fresh from <span class="text-emerald-200">Local Vendors</span>
-        </h1>
-        <p class="text-md sm:text-lg mb-5 text-emerald-100 max-w-2xl">
-            Discover premium quality products from trusted vendors in your community
-        </p>
-
-        <!-- Search Bar -->
-        <form method="GET" action="{{ route('products.search') }}" class="max-w-3xl">
-            <div class="search-input-wrapper">
-                <label for="product-search" class="sr-only">Search products</label>
-                <input id="product-search" type="text" name="q" value="{{ request('search') }}" placeholder="Search products, vendors, or categories..." class="w-full px-5 py-4 rounded-xl text-gray-900 border-0 focus:ring-4 focus:ring-emerald-300/50 shadow-lg placeholder-gray-500 text-lg" aria-label="Search products, vendors, or categories">
-                <button type="submit" class="search-icon" aria-label="Search products">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-
+<div class="max-w-[90rem] mx-auto ">
     
+    <!-- Welcome Header -->
+    <div class="mb-9 animate-slide-in">
+        <div class="">
+            <div class="flex items-center gap-3 mb-2">
+               
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
+                    Hello, {{ Auth::user()->first_name }}!
+                </h1>
+                 <span class="text-3xl sm:text-4xl">👋</span>
+            </div>
+            <h2 class="text-md sm:text-base text-gray-600 ml-0 sm:ml-12">
+                Welcome to Pamilihan Pasabuy. Discover fresh products from trusted local vendors.
+            </h2>
+        </div>
+    </div>
 
 <!--Vendors-->
 @if($vendors->count() > 0)
-    <section class="animate-slide-in mb-8" role="region" aria-label="Vendor listings">
+    <section class="animate-slide-in mb-6" role="region" aria-label="Vendor listings">
         <!-- Section Header -->
-        <header class="mb-6">
+        <header class="mb-3">
             <h2 class="text-xl font-bold text-gray-900 mb-2 flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" 
                      width="24" height="24" viewBox="0 0 24 24" 
@@ -125,9 +111,9 @@
                     <path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"/>
                     <path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"/>
                 </svg>             
-                Meet the Vendors
+                Meet ours Vendors
             </h2>
-            <p class="text-sm text-gray-600">Discover trusted vendors in the San Fernando Market</p>
+            <p class="text-xs text-gray-600">Discover trusted vendors in the San Fernando Market</p>
         </header>
 
         <!-- Carousel Container -->
@@ -152,36 +138,36 @@
                                  tabindex="0">
                             
                             <!-- Banner Section with Default Fallback and Vendor Name -->
-<div class="relative h-20 sm:h-24 overflow-hidden">
-    @if($vendor->shop_banner_url)
-        <img src="{{ asset('storage/' . $vendor->shop_banner_url) }}" 
-             alt="Banner for {{ $vendor->vendor_name }}" 
-             class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-             loading="lazy">
-    @else
-        <img src="{{ asset('images/bg-banner.png') }}" 
-             alt="Default banner" 
-             class="w-full h-full object-cover">
-    @endif
-
-    <!-- Vendor Name Overlay -->
-    <div class="absolute bottom-2 left-3 text-white text-sm sm:text-base font-semibold drop-shadow-md">
-        {{ $vendor->vendor_name }}
-    </div>
-    
-    <!-- Status Badge Overlay -->
-    <div class="absolute top-2 sm:top-3 right-2 sm:right-3 flex flex-col gap-1 sm:gap-2">
-
-        <span class="inline-flex items-center px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-xs font-medium shadow-sm
-                    {{ $vendor->is_accepting_orders 
-                       ? 'bg-green-100 text-green-800 border border-green-200' 
-                       : 'bg-red-100 text-red-800 border border-red-200' }}">
-            <span class="w-1.5 h-1.5 rounded-full mr-1 sm:mr-1.5 
-                        {{ $vendor->is_accepting_orders ? 'bg-green-400' : 'bg-red-400' }}"></span>
-            {{ $vendor->is_accepting_orders ? 'Open' : 'Closed' }}
-        </span>
-    </div>
-</div>
+                                <div class="relative h-20 sm:h-24 overflow-hidden">
+                                    @if($vendor->shop_banner_url)
+                                        <img src="{{ asset('storage/' . $vendor->shop_banner_url) }}" 
+                                             alt="Banner for {{ $vendor->vendor_name }}" 
+                                             class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                                             loading="lazy">
+                                    @else
+                                        <img src="{{ asset('images/bg-banner.png') }}" 
+                                             alt="Default banner" 
+                                             class="w-full h-full object-cover">
+                                    @endif
+                                
+                                    <!-- Vendor Name Overlay -->
+                                    <div class="absolute bottom-2 left-3 text-white text-sm sm:text-base font-semibold drop-shadow-md">
+                                        {{ $vendor->vendor_name }}
+                                    </div>
+                                    
+                                    <!-- Status Badge Overlay -->
+                                    <div class="absolute top-2 sm:top-3 right-2 sm:right-3 flex flex-col gap-1 sm:gap-2">
+                                
+                                        <span class="inline-flex items-center px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-xs font-medium shadow-sm
+                                                    {{ $vendor->is_accepting_orders 
+                                                       ? 'bg-green-100 text-green-800 border border-green-200' 
+                                                       : 'bg-red-100 text-red-800 border border-red-200' }}">
+                                            <span class="w-1.5 h-1.5 rounded-full mr-1 sm:mr-1.5 
+                                                        {{ $vendor->is_accepting_orders ? 'bg-green-400' : 'bg-red-400' }}"></span>
+                                            {{ $vendor->is_accepting_orders ? 'Open' : 'Closed' }}
+                                        </span>
+                                    </div>
+                                </div>
 
                             <!-- Content Section -->
                             <div class="p-4 sm:p-5">
@@ -237,21 +223,7 @@
                                 </p>
                             @endif
 
-                                <!-- Footer -->
-                                <div class="flex items-center justify-between pt-2 border-t border-gray-100">
-                                    @if($vendor->accepts_cod)
-                                        <span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">
-                                            <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                            </svg>
-                                            <span class="hidden sm:inline">COD Available</span>
-                                            <span class="sm:hidden">COD</span>
-                                        </span>
-                                    @else
-                                        <div></div> <!-- Spacer -->
-                                    @endif
-                                    
-                                </div>
+                                
                             </div>
                         </article>
                       </a>
@@ -396,10 +368,55 @@
         @foreach($categoryProducts as $category)
             @if($category->products->count() > 0)
                 <div class="animate-slide-in mb-7">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-emerald-600 mr-2 lucide lucide-grid-3x3-icon lucide-grid-3x3"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                        {{ $category->category_name }}
-                    </h3>
+                  <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+    @if($category->category_name === 'Fish')
+        <!-- Fish Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-fish-icon lucide-fish mr-2 w-5 h-5 text-emerald-600">
+            <path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z"/>
+            <path d="M18 12v.5"/>
+            <path d="M16 17.93a9.77 9.77 0 0 1 0-11.86"/>
+            <path d="M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33"/>
+            <path d="M10.46 7.26C10.2 5.88 9.17 4.24 8 3h5.8a2 2 0 0 1 1.98 1.67l.23 1.4"/>
+            <path d="m16.01 17.93-.23 1.4A2 2 0 0 1 13.8 21H9.5a5.96 5.96 0 0 0 1.49-3.98"/>
+        </svg>
+        {{ $category->category_name }}
+    @elseif($category->category_name === 'Meat')
+        <!-- Meat Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-beef-icon lucide-beef mr-2 w-5 h-5 text-emerald-600">
+            <path d="M16.4 13.7A6.5 6.5 0 1 0 6.28 6.6c-1.1 3.13-.78 3.9-3.18 6.08A3 3 0 0 0 5 18c4 0 8.4-1.8 11.4-4.3"/>
+            <path d="m18.5 6 2.19 4.5a6.48 6.48 0 0 1-2.29 7.2C15.4 20.2 11 22 7 22a3 3 0 0 1-2.68-1.66L2.4 16.5"/>
+            <circle cx="12.5" cy="8.5" r="2.5"/>
+        </svg>
+        {{ $category->category_name }}s
+    @elseif($category->category_name === 'Fruit')
+        <!-- Fruit Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-citrus-icon lucide-citrus mr-2 w-5 h-5 text-emerald-600">
+            <path d="M21.66 17.67a1.08 1.08 0 0 1-.04 1.6A12 12 0 0 1 4.73 2.38a1.1 1.1 0 0 1 1.61-.04z"/>
+            <path d="M19.65 15.66A8 8 0 0 1 8.35 4.34"/>
+            <path d="m14 10-5.5 5.5"/>
+            <path d="M14 17.85V10H6.15"/>
+        </svg>
+        {{ $category->category_name }}s
+    @elseif($category->category_name === 'Vegetable')
+        <!-- Vegetable Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-leafy-green-icon lucide-leafy-green mr-2 w-5 h-5 text-emerald-600">
+            <path d="M2 22c1.25-.987 2.27-1.975 3.9-2.2a5.56 5.56 0 0 1 3.8 1.5 4 4 0 0 0 6.187-2.353 3.5 3.5 0 0 0 3.69-5.116A3.5 3.5 0 0 0 20.95 8 3.5 3.5 0 1 0 16 3.05a3.5 3.5 0 0 0-5.831 1.373 3.5 3.5 0 0 0-5.116 3.69 4 4 0 0 0-2.348 6.155C3.499 15.42 4.409 16.712 4.2 18.1 3.926 19.743 3.014 20.732 2 22"/>
+            <path d="M2 22 17 7"/>
+        </svg>
+        {{ $category->category_name }}s
+    @else
+        <!-- Default Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-emerald-600 mr-2 lucide lucide-grid-3x3-icon lucide-grid-3x3">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        {{ $category->category_name }}s
+    @endif
+</h3>
+
+
 
                     <!-- Carousel Container with Scroll Hints -->
                     <div class="relative group">

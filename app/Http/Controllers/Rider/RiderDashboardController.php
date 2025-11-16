@@ -8,6 +8,7 @@ use App\Models\Rider;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class RiderDashboardController extends Controller
@@ -99,6 +100,9 @@ class RiderDashboardController extends Controller
                 'average_delivery_time' => $this->getAverageDeliveryTime($user->id),
                 'customer_satisfaction' => $rider->average_rating ?? 0,
             ],
+
+            // Rider rank based on merit system
+            'rider_rank' => $this->getRiderRank($rider->id, $user->id),
         ];
     }
 
@@ -373,6 +377,65 @@ class RiderDashboardController extends Controller
         // This would require pickup_time and delivery_time fields
         // For now, return a placeholder
         return '25 mins';
+    }
+
+    /**
+     * Get rider's rank based on merit system
+     * Merit Score = (average_rating * 0.6) + (log(total_deliveries + 1) * 0.3) + (comment_count * 0.1)
+     * Only returns rank if rider is in top 3
+     * 
+     * @param int $riderId
+     * @param int $userId
+     * @return array|null
+     */
+    private function getRiderRank($riderId, $userId)
+    {
+        // Get all riders with merit scores, same logic as CustomerMeritSystemController
+        $riders = DB::table('riders as r')
+            ->join('users as u', 'r.user_id', '=', 'u.id')
+            ->leftJoin('ratings as rat', function($join) {
+                $join->on('rat.rateable_id', '=', 'r.user_id')
+                     ->where('rat.rateable_type', '=', 'App\\Models\\User');
+            })
+            ->select([
+                'r.id',
+                'r.user_id',
+                'u.first_name',
+                'u.last_name',
+                'r.average_rating',
+                'r.total_deliveries',
+                DB::raw('COUNT(CASE WHEN rat.comment IS NOT NULL AND rat.comment != "" THEN 1 END) as comment_count'),
+                DB::raw('(
+                    COALESCE(r.average_rating, 0) * 0.6 + 
+                    LOG(r.total_deliveries + 1) * 0.3 + 
+                    COUNT(CASE WHEN rat.comment IS NOT NULL AND rat.comment != "" THEN 1 END) * 0.1
+                ) as merit_score')
+            ])
+            ->where('r.verification_status', 'verified')
+            ->where('u.is_active', true)
+            ->groupBy('r.id', 'r.user_id', 'u.first_name', 'u.last_name', 'r.average_rating', 'r.total_deliveries')
+            ->orderBy('merit_score', 'desc')
+            ->get();
+
+        // Find current rider's position
+        $rank = null;
+        foreach ($riders as $index => $rider) {
+            if ($rider->id == $riderId) {
+                $rank = $index + 1; // 1-indexed rank
+                break;
+            }
+        }
+
+        // Only return rank data if rider is in top 3
+        if ($rank && $rank <= 3) {
+            return [
+                'rank' => $rank,
+                'merit_score' => $riders[$rank - 1]->merit_score ?? 0,
+                'total_riders' => $riders->count(),
+            ];
+        }
+
+        return null;
     }
 
     /**

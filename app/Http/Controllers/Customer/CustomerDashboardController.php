@@ -59,20 +59,24 @@ class CustomerDashboardController extends Controller
     $products = $query->paginate(12)->withQueryString();
     $categories = Category::orderBy('category_name')->get();
     //  Get 5 random vendors
-    $vendors = Vendor::inRandomOrder()->take(5)->get();
+    $vendors = Vendor::where('is_active', true)
+        ->where('is_accepting_orders', true)
+        ->inRandomOrder()
+        ->take(5)
+        ->get();
 
-    // Get featured products for homepage
+    // Get featured products for homepage (randomized)
     $featuredProducts = Product::with(['vendor.user', 'category'])
         ->where('is_available', true)
         ->whereHas('vendor', function (Builder $query) {
             $query->where('is_active', true)
                   ->where('is_accepting_orders', true);
         })
-        ->latest()
+        ->inRandomOrder()
         ->take(8)
         ->get();
 
-    // Get budget-based products for homepage
+    // Get budget-based products for homepage (randomized)
     $budgetProducts = Product::with(['vendor.user', 'category'])
         ->where('is_available', true)
         ->where('is_budget_based', true)
@@ -80,7 +84,7 @@ class CustomerDashboardController extends Controller
             $query->where('is_active', true)
                   ->where('is_accepting_orders', true);
         })
-        ->latest()
+        ->inRandomOrder()
         ->take(8)
         ->get();
 
