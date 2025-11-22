@@ -114,16 +114,25 @@ public function login(Request $request)
 
         // Set is_available to true for the rider
         $user = Auth::user();
+        $needsSelfieVerification = true;
+
         if ($user && $user->rider) {
             $user->rider->is_available = true;
             $user->rider->save();
         }
 
+        $request->session()->put('requires_selfie_verification', true);
+
+        $redirectUrl = route('rider.selfie-verification.show');
+
         if ($request->ajax()) {
-            return response()->json(['message' => 'Login successful'], 200);
+            return response()->json([
+                'message' => 'Login successful',
+                'redirect' => $redirectUrl,
+            ], 200);
         }
 
-        return redirect()->intended(route('rider.dashboard'));
+        return redirect($redirectUrl);
     }
 
     if ($request->ajax()) {
@@ -156,4 +165,65 @@ public function logout(Request $request)
     return redirect()->route('rider.login');
 }
 
+public function showSelfieVerificationForm()
+{
+    $user = Auth::user();
+
+    if (!$user || $user->role !== 'rider') {
+        return redirect()->route('rider.login');
+    }
+
+    $rider = $user->rider;
+
+    if (!$rider) {
+        Auth::logout();
+        return redirect()->route('rider.login')
+            ->withErrors(['email' => 'Unable to find rider profile. Please contact support.']);
+    }
+
+    return view('auth.rider.selfie-verification', [
+        'rider' => $rider,
+    ]);
+}
+
+public function uploadSelfieVerification(Request $request)
+{
+    $user = Auth::user();
+
+    if (!$user || $user->role !== 'rider' || !$user->rider) {
+        return redirect()->route('rider.login');
+    }
+
+    $request->validate([
+        'selfie' => 'required|image|mimes:jpg,jpeg,png|max:4096',
+    ]);
+
+    $rider = $user->rider;
+
+    try {
+        $file = $request->file('selfie');
+        $path = $file->store('rider_selfies', 'public');
+
+        if ($rider->selfie_verification_url && Storage::disk('public')->exists($rider->selfie_verification_url)) {
+            Storage::disk('public')->delete($rider->selfie_verification_url);
+        }
+
+        $rider->selfie_verification_url = $path;
+        $rider->save();
+
+        $request->session()->forget('requires_selfie_verification');
+
+        return redirect()->route('rider.dashboard')
+            ->with('success', 'Selfie verification uploaded successfully.');
+    } catch (\Exception $e) {
+        \Log::error('Rider selfie upload failed', [
+            'user_id' => $user->id,
+            'error' => $e->getMessage(),
+        ]);
+
+        return back()->withErrors([
+            'selfie' => 'Failed to upload selfie. Please try again.',
+        ])->withInput();
+    }
+}
 }

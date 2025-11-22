@@ -342,6 +342,14 @@ Route::post('/rider/logout', [RiderAuthController::class, 'logout'])
     ->middleware('auth')
     ->name('rider.logout');
 
+// Rider Selfie Verification Routes
+Route::middleware(['auth', 'role:rider'])->prefix('rider')->name('rider.')->group(function () {
+    Route::get('/selfie-verification', [RiderAuthController::class, 'showSelfieVerificationForm'])
+        ->name('selfie-verification.show');
+    Route::post('/selfie-verification', [RiderAuthController::class, 'uploadSelfieVerification'])
+        ->name('selfie-verification.upload');
+});
+
     // Rider Dashboard Routes
 Route::prefix('rider')->name('rider.')->middleware(['auth', 'verified'])->group(function () {
     

@@ -305,10 +305,12 @@
                         // Show success state briefly
                         $btnText.text('Welcome back!');
                         $spinner.addClass('hidden');
+
+                        var redirectUrl = response.redirect || "{{ route('rider.dashboard') }}";
                         
-                        // Redirect to dashboard after brief delay
+                        // Redirect after brief delay
                         setTimeout(function() {
-                            window.location.href = "{{ route('rider.dashboard') }}";
+                            window.location.href = redirectUrl;
                         }, 800);
                     },
                     error: function (xhr) {

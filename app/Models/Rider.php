@@ -20,6 +20,7 @@ class Rider extends Model
         'gcash_number',
         'gcash_qr_path',
         'gcash_name',
+        'selfie_verification_url',
         'current_latitude',
         'current_longitude',
         'location_last_updated_at',
