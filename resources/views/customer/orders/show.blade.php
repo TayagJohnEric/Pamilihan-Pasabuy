@@ -86,7 +86,7 @@
 
                 <!-- Action Buttons -->
                 <div class="flex flex-wrap gap-3 mt-4">
-                    @if($order->status === 'assigned' && $order->payment_method === 'online_payment' && $order->payment_status === 'pending')
+                    @if($order->status === 'out_for_delivery' && $order->payment_method === 'online_payment' && $order->payment_status === 'pending')
                         @php
                             $payment = $order->payment;
                             $hasSubmittedPayment = $payment && $payment->payment_proof_url;
