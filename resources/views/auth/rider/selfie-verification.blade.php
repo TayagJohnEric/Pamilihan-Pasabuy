@@ -63,13 +63,17 @@
                             <span class="text-emerald-600">•</span>
                             Accepted formats: JPG or PNG, up to 4MB.
                         </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-emerald-600">•</span>
+                            On mobile, tapping "Take Photo" will open your camera for a fresh selfie.
+                        </li>
                     </ul>
                 </div>
 
                 <form id="selfie-form" action="{{ route('rider.selfie-verification.upload') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     <div class="upload-area rounded-2xl p-8 text-center" id="drop-area">
-                        <input type="file" name="selfie" id="selfie-input" accept="image/jpeg,image/png" class="hidden" required>
+                        <input type="file" name="selfie" id="selfie-input" accept="image/*" class="hidden" required>
                         <div class="space-y-4">
                             <div class="flex justify-center">
                                 <span class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-50 text-emerald-500">
@@ -83,7 +87,7 @@
                                 <p class="text-lg font-semibold text-gray-800">Drag & Drop your selfie here</p>
                                 <p class="text-sm text-gray-500">or</p>
                                 <button type="button" id="browse-btn" class="mt-2 px-5 py-2 rounded-full bg-emerald-600 text-white font-semibold hover:bg-emerald-500 transition">
-                                    Browse Files
+                                    <span id="browse-btn-label">Browse Files</span>
                                 </button>
                             </div>
                             <p class="text-xs text-gray-500" id="file-name">No file selected</p>
@@ -110,9 +114,20 @@
         const dropArea = document.getElementById('drop-area');
         const fileInput = document.getElementById('selfie-input');
         const browseBtn = document.getElementById('browse-btn');
+        const browseBtnLabel = document.getElementById('browse-btn-label');
         const fileNameEl = document.getElementById('file-name');
         const previewWrapper = document.getElementById('preview-wrapper');
         const previewImg = document.getElementById('selfie-preview');
+
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            fileInput.setAttribute('capture', 'environment');
+            browseBtnLabel.textContent = 'Take Photo';
+        } else {
+            fileInput.removeAttribute('capture');
+            browseBtnLabel.textContent = 'Browse Files';
+        }
 
         function updatePreview(file) {
             if (!file) {
