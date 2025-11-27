@@ -27,7 +27,7 @@ class CustomerCheckoutController extends Controller
      * 
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         
@@ -68,14 +68,29 @@ class CustomerCheckoutController extends Controller
             ->get();
         
         // Get available riders for "Choose My Rider" option
-        $availableRiders = User::with('rider')
+        $riderSearchTerm = $request->query('rider_search');
+
+        $availableRidersQuery = User::with('rider')
             ->whereHas('rider', function ($query) {
                 $query->where('is_available', true)
                     ->where('verification_status', 'verified');
             })
             ->where('role', 'rider')
             ->where('is_active', true)
-            ->select(['id', 'first_name', 'last_name', 'profile_image_url'])
+            ->select(['id', 'first_name', 'last_name', 'profile_image_url']);
+
+        if ($riderSearchTerm) {
+            $availableRidersQuery->where(function ($query) use ($riderSearchTerm) {
+                $likeTerm = '%' . $riderSearchTerm . '%';
+                $query->where('first_name', 'like', $likeTerm)
+                    ->orWhere('last_name', 'like', $likeTerm)
+                    ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', $likeTerm);
+            });
+        }
+
+        $availableRiders = $availableRidersQuery
+            ->orderBy('first_name')
+            ->orderBy('last_name')
             ->get();
         
         // Calculate cart summary
@@ -97,7 +112,8 @@ class CustomerCheckoutController extends Controller
             'subtotal',
             'itemCount',
             'hasBudgetItems',
-            'paymentMethods'
+            'paymentMethods',
+            'riderSearchTerm'
         ));
     }
     
