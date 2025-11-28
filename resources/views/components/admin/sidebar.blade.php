@@ -84,6 +84,7 @@
                             <li><a href="{{ route('admin.products.index') }}" class="block p-2 text-sm {{ request()->routeIs('admin.products.*') ? 'text-green-600 bg-green-50 font-semibold' : 'text-gray-600 hover:text-green-500 hover:bg-green-50' }} rounded-md transition-colors">Products</a></li>
                             <li><a href="{{ route('admin.districts.index') }}" class="block p-2 text-sm {{ request()->routeIs('admin.districts.*') ? 'text-green-600 bg-green-50 font-semibold' : 'text-gray-600 hover:text-green-500 hover:bg-green-50' }} rounded-md transition-colors">Delivery Zones</a></li>
                             <li><a href="{{ route('admin.orders.index') }}" class="block p-2 text-sm {{ request()->routeIs('admin.orders.*') ? 'text-green-600 bg-green-50 font-semibold' : 'text-gray-600 hover:text-green-500 hover:bg-green-50' }} rounded-md transition-colors">Orders</a></li>
+
                         </ul>
                     </div>
                 </div>
@@ -134,6 +135,8 @@
                         <ul class="space-y-1">
                             <li><a href="{{ route('admin.ratings.index') }}" class="block p-2 text-sm {{ request()->routeIs('admin.ratings.*') ? 'text-green-600 bg-green-50 font-semibold' : 'text-gray-600 hover:text-green-500 hover:bg-green-50' }} rounded-md transition-colors">Ratings & Feedback</a></li>
                             <li><a href="{{ route('admin.notifications.index') }}" class="block p-2 text-sm {{ request()->routeIs('admin.notifications.*') ? 'text-green-600 bg-green-50 font-semibold' : 'text-gray-600 hover:text-green-500 hover:bg-green-50' }} rounded-md transition-colors">Notification Log</a></li>
+                            <li><a href="{{ route('admin.rider-authentication.index') }}" class="block p-2 text-sm {{ request()->routeIs('admin.rider-authentication.*') ? 'text-green-600 bg-green-50 font-semibold' : 'text-gray-600 hover:text-green-500 hover:bg-green-50' }} rounded-md transition-colors">Rider Authentication</a></li>
+
                         </ul>
                     </div>
                 </div>

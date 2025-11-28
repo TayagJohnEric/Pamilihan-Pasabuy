@@ -461,6 +461,7 @@ use App\Http\Controllers\Admin\AdminPayoutController;
 use App\Http\Controllers\Admin\AdminSystemSettingController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\AdminPaymentVerificationController;
+use App\Http\Controllers\Admin\AdminRiderAuthenticationController;
 
 
 
@@ -525,6 +526,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::post('orders/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
     Route::post('orders/{id}/assign-rider', [AdminOrderController::class, 'assignRider'])->name('orders.assignRider');
+
+    // Rider Authentication Monitoring
+    Route::get('rider-authentication', [AdminRiderAuthenticationController::class, 'index'])->name('rider-authentication.index');
 
     // Vendors Management
     Route::get('vendors', [AdminVendorController::class, 'index'])->name('vendors.index');
